@@ -1,1 +1,17 @@
-<h1>Registration page</h1>
+<div class='{{classes.registration-page}}'>
+  <div class='card {{classes.registration-page__card}}'>
+    <div class='card__title'>
+      Расскажите о себе?
+    </div>
+    <div class='card__body {{classes.card_gaps}}'>
+      {{#each inputs}}
+        {{>text-field}}
+      {{/each}}
+      <div class="card__body {{classes.buttons_wrapper}}">
+        {{#each buttons}}
+          {{>button}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+@import '../../utils/variables.scss';
+
+.btn {
+  background: none;
+  border-radius: 4px;
+  border: none;
+  height: 32px;
+  font-size: $base-text;
+  width: 100%;
+
+  &_filled {
+    color: #fff;
+    background-color: #409eff;
+  }
+
+  &_stroke {
+    color: #409eff;
+    border: 1px solid #409eff;
+    box-sizing: border-box;
+    border-radius: 4px;
+  }
+}

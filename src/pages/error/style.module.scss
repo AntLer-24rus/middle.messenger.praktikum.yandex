@@ -1,0 +1,25 @@
+.error-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  &__card {
+    padding-top: calc(169px - 20px) !important;
+    width: 900px;
+    height: 629px;
+  }
+  &__code {
+    font-size: 96px !important;
+    line-height: 112px !important;
+  }
+  &__message {
+    font-size: 24px !important;
+    line-height: 28px !important;
+    text-align: center;
+  }
+  &__button {
+    padding-top: 60px;
+    width: 220px;
+    text-align: center;
+  }
+}

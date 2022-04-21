@@ -1,0 +1,39 @@
+.dev-panel {
+  height: 50px;
+  width: 100%;
+  background: #455868;
+  font-size: 10pt;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  &__title {
+    height: 30px;
+    padding: 5 0;
+  }
+
+  a {
+    color: #fff;
+    display: inline-block;
+    width: 130px;
+    text-align: center;
+    text-decoration: none;
+    line-height: 20px;
+  }
+  a:hover {
+    background-color: #8c99a4;
+  }
+  ul {
+    li {
+      display: inline;
+      a {
+        border-right: 1px solid #576979;
+      }
+    }
+    li:last-child {
+      a {
+        border: none;
+      }
+    }
+  }
+}
