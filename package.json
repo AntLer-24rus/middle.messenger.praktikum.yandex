@@ -2,9 +2,10 @@
   "name": "antler-chats",
   "version": "0.0.1",
   "description": "Учебный проект чата",
-  "main": "index.js",
   "scripts": {
-    "dev": "parcel src/index.html"
+    "dev": "parcel src/index.html",
+    "build": "parcel build src/index.html",
+    "clean": "rimraf dist .parcel-cache"
   },
   "repository": {
     "type": "git",
@@ -19,7 +20,8 @@
   "homepage": "https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex#readme",
   "devDependencies": {
     "parcel": "^2.4.1",
-    "parcel-transformer-hbs": "^1.0.4"
+    "parcel-transformer-hbs": "^1.0.4",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
     "express": "^4.17.3",
