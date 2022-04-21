@@ -45,3 +45,7 @@ npm run clean
 ```
 
 Текущая версия доступна на [netlify](https://ubiquitous-entremet-7f80bf.netlify.app)
+
+## Pull requests
+
+Первый спринт [sprint_1](https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex/pull/1)
