@@ -1,1 +1,5 @@
-console.log('Hello sprint 1')
+import pages from './pages'
+import { mountPage, registerPages } from './utils'
+
+registerPages(pages)
+mountPage()
