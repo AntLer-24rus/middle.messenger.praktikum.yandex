@@ -22,8 +22,6 @@
   "devDependencies": {
     "@parcel/transformer-sass": "^2.4.1",
     "cross-env": "^7.0.3",
-    "i": "^0.3.7",
-    "npm": "^8.7.0",
     "parcel": "^2.4.1",
     "parcel-transformer-hbs": "^1.0.4",
     "rimraf": "^3.0.2"
