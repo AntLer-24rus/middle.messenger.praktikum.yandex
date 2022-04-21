@@ -1,7 +1,6 @@
 import Handlebars from 'handlebars'
 
 export function registerPages(pages) {
-  console.log('pages :>> ', pages)
   for (const [path, page] of pages) {
     if (!path.startsWith('/')) continue
     Handlebars.registerPartial(path, page.render)

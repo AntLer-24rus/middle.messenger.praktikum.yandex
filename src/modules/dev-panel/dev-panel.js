@@ -1,4 +1,5 @@
 import template from './dev-panel.hbs'
+import * as classes from './style.module.scss'
 
 export default {
   name: 'dev-panel',
@@ -10,6 +11,7 @@ export default {
     }
     return template({
       pages: [...pages.map((i) => i.replace('/', '')), 'unknown', 'error'],
+      classes,
     })
   },
 }

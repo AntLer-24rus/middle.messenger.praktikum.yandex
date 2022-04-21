@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex#readme",
   "devDependencies": {
+    "@parcel/transformer-sass": "^2.4.1",
     "parcel": "^2.4.1",
     "parcel-transformer-hbs": "^1.0.4",
     "rimraf": "^3.0.2"
