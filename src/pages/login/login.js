@@ -1,6 +1,6 @@
 import template from './login.hbs'
 import * as classes from './style.module.scss'
-import modules from '../../modules'
+import { textField, button } from '../../modules'
 
 const inputs = [
   {
@@ -27,7 +27,7 @@ const buttons = [
   },
 ]
 
-export default {
+export const loginPage = {
   name: 'login-page',
   render: () => {
     return template(
@@ -38,8 +38,8 @@ export default {
       },
       {
         partials: {
-          'text-field': modules.get('text-field').render,
-          button: modules.get('button').render,
+          'text-field': textField.render,
+          button: button.render,
         },
       }
     )

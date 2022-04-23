@@ -1,7 +1,7 @@
 import Handlebars from 'handlebars'
 
-import pages from '../pages'
-import modules from '../modules'
+import { pages } from '../pages'
+import { devPanel } from '../modules'
 
 Handlebars.registerHelper('pageName', () => window.location.pathname)
 const pageTemplate = Handlebars.compile('{{> (pageName) }}')
@@ -27,7 +27,6 @@ function renderPage() {
 
 export function mountPage() {
   if (process.env.NODE_ENV !== 'production') {
-    const devPanel = modules.get('dev-panel')
     const app = document.querySelector('#app')
     app.style.height = 'calc(100vh - 55px)'
     const body = document.querySelector('body')

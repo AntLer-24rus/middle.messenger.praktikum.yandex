@@ -1,7 +1,7 @@
 import template from './dev-panel.hbs'
 import * as classes from './style.module.scss'
 
-export default {
+export const devPanel = {
   name: 'dev-panel',
   render: ({ pages = [], rerender = () => {} } = {}) => {
     window.linkHandler = (event) => {
