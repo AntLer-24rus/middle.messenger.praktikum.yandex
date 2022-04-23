@@ -1,9 +1,11 @@
+@import '../../utils/variables.scss';
+
 .dev-panel {
   height: 50px;
   width: 100%;
-  background: #455868;
+  background: $color-white;
   font-size: 10pt;
-  color: #fff;
+  color: $color-black;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,7 +15,7 @@
   }
 
   a {
-    color: #fff;
+    color: $color-black;
     display: inline-block;
     width: 130px;
     text-align: center;
@@ -21,13 +23,13 @@
     line-height: 20px;
   }
   a:hover {
-    background-color: #8c99a4;
+    background-color: $color-gray-extra-light;
   }
   ul {
     li {
       display: inline;
       a {
-        border-right: 1px solid #576979;
+        border-right: 1px solid $color-gray;
       }
     }
     li:last-child {

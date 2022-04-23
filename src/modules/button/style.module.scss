@@ -9,13 +9,13 @@
   width: 100%;
 
   &_filled {
-    color: #fff;
-    background-color: #409eff;
+    color: $color-white;
+    background-color: $color-primary;
   }
 
   &_stroke {
-    color: #409eff;
-    border: 1px solid #409eff;
+    color: $color-primary;
+    border: 1px solid $color-primary;
     box-sizing: border-box;
     border-radius: 4px;
   }
