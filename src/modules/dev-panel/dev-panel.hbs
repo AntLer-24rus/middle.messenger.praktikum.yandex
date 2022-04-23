@@ -4,7 +4,11 @@
   <ul>
     <li><a href='/' onclick='linkHandler(event)'>home</a></li>
     {{#each pages}}
-      <li><a href='/{{this}}' onclick='linkHandler(event)'>{{this}}</a></li>
+      <li>
+        <a href='{{this.href}}' onclick='linkHandler(event)'>
+          {{this.text}}
+        </a>
+      </li>
     {{/each}}
   </ul>
 </div>

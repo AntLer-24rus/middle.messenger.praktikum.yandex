@@ -9,8 +9,13 @@ export default {
       window.history.pushState({}, '', event.target.pathname)
       rerender()
     }
+    const additionalPages = ['/unknown', '/error']
     return template({
-      pages: [...pages.map((i) => i.replace('/', '')), 'unknown', 'error'],
+      pages: [
+        ...pages
+          .concat(additionalPages)
+          .map((i) => ({ href: i, text: i.slice(1) })),
+      ],
       classes,
     })
   },
