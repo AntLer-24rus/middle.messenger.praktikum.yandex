@@ -1,0 +1,14 @@
+<div class='{{classes.error-page}}'>
+  <div class='card {{classes.error-page__card}}'>
+    <div class='card__title {{classes.error-page__code}}'>{{code}}</div>
+    <div class='card__body'>
+      <p class='{{classes.error-page__message}}'>{{text}}</p>
+      <div class="{{classes.error-page__button}}">
+        {{#with button}}
+          {{>button}}
+        {{/with}}
+      </div>
+    </div>
+    
+  </div>
+</div>

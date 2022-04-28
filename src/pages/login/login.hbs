@@ -1,0 +1,17 @@
+<div class='{{classes.login-page}}'>
+  <div class='card {{classes.login-page__card}}'>
+    <div class='card__title'>
+      Привет
+    </div>
+    <div class='card__body'>
+      {{#each inputs}}
+        {{>text-field}}
+      {{/each}}
+      <div class="card__body {{classes.buttons_wrapper}}">
+        {{#each buttons}}
+          {{>button}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>
