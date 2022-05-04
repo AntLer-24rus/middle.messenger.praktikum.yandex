@@ -1,0 +1,39 @@
+{
+  // Используйте IntelliSense, чтобы узнать о возможных атрибутах.
+  // Наведите указатель мыши, чтобы просмотреть описания существующих атрибутов.
+  // Для получения дополнительной информации посетите: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "firefox",
+      "request": "launch",
+      "name": "Launch Firefox against localhost",
+      "url": "http://localhost:1234",
+      "webRoot": "${workspaceFolder}/dist",
+      "breakOnLoad": true,
+      "sourceMapPathOverrides": {
+        "/__parcel_source_root/*": "${webRoot}/*"
+      },
+      "pathMappings": [
+        {
+          "url": "file:///__parcel_source_root/src",
+          "path": "${workspaceFolder}/src"
+        }
+      ]
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Debug TS, Parcel app in Chrome",
+      "url": "http://localhost:1234/",
+      "webRoot": "${workspaceFolder}/src",
+      "pathMapping": {
+        "__parcel_source_root": "${workspaceFolder}/src"
+      },
+      "skipFiles": [
+        "${workspaceFolder}/parcel/node_modules/**/*.js",
+        "<node_internals>/**/*.js"
+      ]
+    }
+  ]
+}

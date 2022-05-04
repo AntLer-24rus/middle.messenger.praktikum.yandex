@@ -1,0 +1,18 @@
+<div class="page">
+  <div class="template"  >{{TestString}}</div>
+  <div class="template2" $click="test2">Test string2</div>
+  {{!-- {{>comp name="button" props=TestString }} --}}
+  {{#>comp name="Card" $click="test2" title=cardProps.title }}
+    {{#>slot name="default"}}
+      <div $click="test">Test in block</div>
+      {{#each inputs}}
+        {{>comp name="Input" $input="test2" placeholder=this.placeholder }}
+      {{/each}}
+      {{>comp name="Input" placeholder="Вне цикла" }}
+    {{/slot}}
+    {{#>slot name="actions"}}
+      <div>Actions {{TestString}}</div>
+    {{/slot}}
+  {{/comp}}
+  {{>comp name="Card" $click="test2" title="Card 2" }}
+</div>

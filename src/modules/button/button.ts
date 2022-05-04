@@ -1,5 +1,5 @@
 import template from './button.hbs'
-import * as classes from './style.module.scss'
+import classes from './style.module.scss'
 
 export const button = {
   name: 'button',
