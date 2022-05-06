@@ -1,16 +1,21 @@
-import { TemplateDelegate } from 'handlebars'
+import { RuntimeOptions, TemplateDelegate } from 'handlebars'
 import { v4 as uuid } from 'uuid'
-import { last, EventBus } from './index'
+import { last, first, EventBus } from './index'
+import { saveReplaceProperty } from './saveReplaceProperty'
 
 const EVENT_PREFIX = '$'
 const EVENT_PREFIX_SLOT = '$slot:'
+const DATA_SET_ID = 'id'
 
+const noopRender: TemplateDelegate = (ctx) => ''
+
+type ComponentSlots = Record<string, TemplateDelegate>
 type ComponentOptions<T = any> = {
   name: string
   renderer: TemplateDelegate
   parent?: Component
   slotRenderer?: Function
-  slots?: { name: string; renderer: () => string }[]
+  slots?: ComponentSlots
   methods?: Record<string, Function>
   components?: ComponentExtConstructor[]
   props?: any
@@ -19,6 +24,10 @@ type ComponentOptions<T = any> = {
   events?: Record<string, (this: T, e: Event) => void>
 }
 
+interface BaseComponentOptions {
+  name: string
+  parent?: Component
+}
 export type ComponentExtOptions = Omit<ComponentOptions, 'name' | 'renderer'>
 
 type ComponentMeta = {
@@ -46,40 +55,33 @@ const enum EVENTS {
 export abstract class Component implements ComponentInterface {
   [key: string | symbol]: any
   private _meta: ComponentMeta
-  private _element: Element = document.createElement('div')
-  private _data: any
+  private _element: Element | null = null
+  protected data: any
   private _events: Record<string, (e: Event) => void> = {}
   private _eventBus: EventBus = new EventBus()
   private _parent: Component | undefined = undefined
-  private _slots: { name: string; renderer: () => string }[] = []
+  // private _slots: ComponentSlots
   private _children: Component[] = []
-  private _renderer: Function
+  // private _renderer: Function
   private _nativeListeners: {
     el: Element
     eventName: string
     callback: (e: Event) => void
   }[] = []
+  // private _hbsRuntimeOptions: RuntimeOptions
 
   constructor({
     name,
     parent,
-    renderer,
-    slots = [],
-    components = [],
     props = {},
     data = () => ({}),
     events = {},
     listeners,
   }: ComponentOptions) {
     this._meta = { name, id: uuid() }
-    this._renderer = renderer
     this._parent = parent
 
-    // this._events = events
-    this._slots = slots
-
-    // const innerData = ()
-    this._data = new Proxy(
+    this.data = new Proxy(
       { ...data(), ...props },
       {
         set: (target, prop, value) => {
@@ -95,123 +97,41 @@ export abstract class Component implements ComponentInterface {
     for (const key in events) {
       if (Object.prototype.hasOwnProperty.call(events, key)) {
         const element = events[key]
-        console.log(`${this.name} element :>> `, element)
-        this._events[key] = element.bind(this._data)
+        this._events[key] = element.bind(this.data)
       }
     }
 
     this._registerEvents(listeners)
-    this._init(components)
+  }
+
+  public get children() {
+    return this._children
+  }
+
+  abstract render(context: any): DocumentFragment
+  private _render() {
+    const fragment = this.render({ ...this.data })
+
+    const first = fragment.firstElementChild
+    if (!first)
+      throw new Error('Ошибка в шаблоне, невозможно получить первый элемент')
+
+    if (this._element) {
+      this._removeEvents()
+      this._element.replaceWith(first)
+    }
+
+    this._element = first
+
+    this._addEvents()
   }
 
   private _update(data: any) {
     console.log('new data :>> ', data)
-    Object.assign(this._data, data)
+    Object.assign(this.data, data)
   }
 
-  private _template(context: any): string {
-    const res = this._renderer(context, {
-      partials: {
-        comp: (...args: any[]) => {
-          const {
-            hash,
-            data: { index = 0 },
-          } = last(args)
-
-          const allChields = this._children.filter((c) => c.name === hash.name)
-          const child = allChields[index]
-          if (!child) throw new Error('Неизвестная ошибка')
-          return `<div data-id="${child.id}"></div>`
-        },
-        slot: (...args: any[]) => {
-          const { hash, fn: defaultRenderer = () => '' } = last(args)
-          const slot = this._slots.find((s) => s.name === hash.name)
-          let res: string = ''
-          if (!slot) res = defaultRenderer()
-          else res = slot.renderer()
-          return res.replace(EVENT_PREFIX, EVENT_PREFIX_SLOT)
-        },
-      },
-    })
-    return res
-  }
-
-  private _init(components: ComponentExtConstructor[]) {
-    const template = document.createElement('template')
-    template.innerHTML = this._renderer(
-      {},
-      {
-        partials: {
-          comp: () => '',
-          slot: () => '',
-        },
-      }
-    )
-    const first = template.content.children.item(0)
-    if (!first || template.content.children.length > 1)
-      throw new Error('Ошибка в шаблоне, должен быть один корневой элемент')
-    this._element = first
-
-    type PrepComp = {
-      name: string
-      slots: { name: string; renderer: () => string }[]
-      childs: PrepComp[]
-    }
-    const stack: PrepComp[] = []
-    this._renderer(
-      { ...this._data },
-      {
-        partials: {
-          comp: (...args: any[]) => {
-            const { hash, fn } = last(args)
-            stack.push({ name: hash.name, slots: [], childs: [] })
-            if (fn && typeof fn === 'function') fn()
-            const compDesc = stack.pop()
-            if (!compDesc) throw new Error('Неизвестная ошибка')
-
-            const CompConstructor = components.find(
-              (c) => c.name === compDesc.name
-            )
-            if (!CompConstructor)
-              throw new Error(
-                `Компонент ${compDesc.name} не найден в зависимостях ${this.name}`
-              )
-
-            const comp = new CompConstructor({
-              slots: compDesc.slots,
-              props: Object.fromEntries(
-                Object.entries(hash).filter(
-                  ([key]) => key !== 'name' && !key.startsWith(EVENT_PREFIX)
-                )
-              ),
-              parent: this,
-              listeners: Object.entries(hash)
-                .filter(([key]) => key.startsWith(EVENT_PREFIX))
-                .map(([key, value]) => ({
-                  eventName: key.slice(EVENT_PREFIX.length),
-                  callback: () => value,
-                })),
-            })
-            this._children.push(comp)
-            return ''
-          },
-          slot: (...args: any[]) => {
-            const { hash, fn } = last(args)
-            const comp = last(stack)
-            if (comp) {
-              if (typeof fn !== 'function')
-                throw new Error('Неправильное использование slot')
-              comp.slots.push({
-                name: hash.name,
-                renderer: () => fn(this._data), //Передаем контекст root элемента
-              })
-              return fn()
-            }
-            return ''
-          },
-        },
-      }
-    )
+  protected init() {
     this._eventBus.emit(EVENTS.RENDER)
   }
 
@@ -278,54 +198,25 @@ export abstract class Component implements ComponentInterface {
   }
 
   private _addEvents() {
+    if (!this._element)
+      throw new Error('Установка обработчиков до создания компонента')
     Object.keys(this._events).forEach((eventName) => {
-      this._element.addEventListener(eventName, this._events[eventName])
+      this._element!.addEventListener(eventName, this._events[eventName])
     })
   }
   private _removeEvents() {
+    if (!this._element)
+      throw new Error('Удаление обработчиков до создания компонента')
     Object.keys(this._events).forEach((eventName) => {
-      this._element.removeEventListener(eventName, this._events[eventName])
+      this._element!.removeEventListener(eventName, this._events[eventName])
     })
-  }
-  private _render() {
-    this._removeEvents()
-
-    const fragment = document.createElement('template')
-
-    this._element.innerHTML = ''
-
-    fragment.innerHTML = this._template({ ...this._data })
-
-    if (this._children.length) {
-      let stub = fragment.content.querySelector<HTMLElement>(`[data-id]`)
-      while (stub !== null) {
-        const id = stub.dataset.id
-        if (!id) throw new Error('Неизвестная ошибка')
-
-        const child = this._children.find((c) => c.id === id)
-        if (!child) throw new Error('Неизвестная ошибка')
-        //FIXME Перерисовка всех дочек имеющих слоты в не зависимости от пропсов
-        //FIXME Двойная перерисовка дочек имеющих слоты
-        if (child._slots.length) child._render()
-
-        stub.replaceWith(child.getContent())
-
-        stub = fragment.content.querySelector<HTMLElement>(`[data-id]`)
-      }
-    }
-
-    const first = fragment.content.firstChild
-    if (!first) throw new Error('ошибка в шаблоне')
-    this._element.append(...first.childNodes)
-
-    this._addEvents()
-    // if (this._parent) this._parent._eventBus.emit(EVENTS.RENDER)
   }
 
   // Public interface --------------------------------------------
   public getContent() {
     const content = this._element
-    if (!content) throw new Error('Неизвестная ошибка')
+    if (!content)
+      throw new Error('Запрос на получение компонента до инициализации')
     return content
   }
   public get name() {
@@ -348,6 +239,10 @@ export abstract class Component implements ComponentInterface {
     // }
   }
   public mount(selector: string) {
+    if (this._parent)
+      throw new Error(
+        'Запрос на монтирование можно вызывать только у корневого элемента'
+      )
     const mountPoint = document.querySelector(selector)
     if (!mountPoint)
       throw new Error(`В документе не найден селектор ${selector}`)
@@ -355,58 +250,166 @@ export abstract class Component implements ComponentInterface {
   }
 }
 
+const knownComponents: ComponentExtConstructor[] = []
 export function defineComponent<T = any>(
   options: ComponentOptions<T>
 ): ComponentExtConstructor {
-  // const res =
-  return {
-    [options.name]: class extends Component {
-      constructor(extOptions: ComponentExtOptions) {
-        super({
-          ...extOptions,
-          ...options,
-        })
+  knownComponents.push(...(options.components ?? []))
+  const renderer = options.renderer
+
+  // FIXME Перерендер дочерних компонентов каждый раз при рендере родителя
+  const extComponent = class extends Component {
+    private _slots: ComponentSlots = {}
+    private _hbsRuntimeOptions: RuntimeOptions
+    private _indexCompPartial: number = 0
+
+    public static componentName: string = options.name
+    constructor(extOptions: ComponentExtOptions) {
+      super({
+        ...extOptions,
+        ...options,
+      })
+      this._hbsRuntimeOptions = {
+        partials: {
+          comp: this._prepareComponent.bind(this),
+          slot: this._prepareSlot.bind(this),
+        },
       }
-    },
-  }[options.name]
+      this._slots = extOptions.slots ?? {}
+      console.log(`Created component ${extComponent.componentName}`)
+      this.init()
+    }
 
-  // return new Proxy(res, {
-  //   construct(target, args) {
-  //     const obj = new target(args[0])
-  //     return new Proxy(obj, {
-  //       get: (t, p) => {
-  //         console.log('get proxy :>> ', p)
-  //         // if (p === '_events') {
-  //         //   const events = t[p]
-  //         //   Object.keys(events).forEach((k) => {
-  //         //     events[k] = events[k].bind(this)
-  //         //   })
-  //         //   return events
-  //         // }
+    private setSlots(slots: ComponentSlots) {
+      this._slots = slots
+      this.init()
+    }
+    private getChild(name: string): Component {
+      let comp = this.children.filter((ch) => ch.name === name)[
+        this._indexCompPartial
+      ]
+      return comp
+    }
+    private _getKnownComponent(
+      componentName: string
+    ): ComponentExtConstructor | undefined {
+      return knownComponents.find((kc) => kc.componentName === componentName)
+    }
+    private _prepareSlot(...args: any[]): string {
+      const {
+        hash: { name: slotName },
+        fn: baseSlotRenderer = noopRender,
+      }: {
+        hash: { name: string }
+        fn: TemplateDelegate
+      } = last(args)
 
-  //         return t[p]
-  //       },
-  //       apply(t, thisArg, args) {
-  //         console.log('thisArg :>> ', thisArg, args)
-  //         t.apply(thisArg, args)
-  //       },
-  //     })
-  //   },
-  // })
+      const slotRenderer = this._slots[slotName] ?? baseSlotRenderer
+
+      return slotRenderer(
+        { parentComponent: this },
+        this._hbsRuntimeOptions.partials
+      )
+    }
+    private _prepareComponent(...args: any[]): string {
+      const { parentComponent = this }: { parentComponent: Component } =
+        first(args)
+      const {
+        hash: { name: componentName, ...propsAndHandler },
+        fn: blockRenderer = noopRender,
+        partials: basePartials,
+      }: {
+        hash: { name: string; [key: string]: any }
+        fn: TemplateDelegate
+        partials: any
+      } = last(args)
+
+      const props = Object.fromEntries(
+        Object.entries(propsAndHandler).filter(
+          ([key]) => !key.startsWith(EVENT_PREFIX)
+        )
+      )
+
+      const slots: ComponentSlots = {}
+      const collectSlotRenderer: TemplateDelegate = (...args: any[]) => {
+        const {
+          hash: { name: slotName },
+          fn: slotRenderer,
+        } = last(args)
+        slots[slotName] = (context: any, localPartials: any) => {
+          const restorePartials = saveReplaceProperty(
+            basePartials,
+            localPartials
+          )
+          const slotTemplate = slotRenderer(context)
+          restorePartials()
+          return slotTemplate
+        }
+        return ''
+      }
+      const restorePartials = saveReplaceProperty(basePartials, {
+        slot: collectSlotRenderer,
+      })
+      blockRenderer(this.data)
+      restorePartials()
+
+      const ComponentConstructor = this._getKnownComponent(componentName)
+      if (!ComponentConstructor)
+        throw new Error(
+          `Компонент ${componentName} не найден в известных компонентах`
+        )
+
+      let component = parentComponent.getChild(componentName)
+      console.log(
+        `component ${this.name} - ${parentComponent.name}:>> `,
+        component?.name,
+        component?.id
+      )
+
+      if (!component) {
+        component = new ComponentConstructor({
+          slots,
+          parent: parentComponent,
+          props: Object.fromEntries(
+            Object.entries(props).filter(
+              ([key]) => !key.startsWith(EVENT_PREFIX)
+            )
+          ),
+        })
+
+        parentComponent.children.push(component)
+      } else {
+        if (Object.keys(slots).length > 0) component.setSlots(slots)
+      }
+
+      const dataAttr = `data-${DATA_SET_ID}="${component.id}`
+
+      parentComponent._indexCompPartial++
+      return `
+      <div ${dataAttr}">${componentName} -> ${JSON.stringify(props)}</div>
+      `.trim()
+    }
+    render(context: any): DocumentFragment {
+      const fragment = document.createElement('template')
+
+      this._indexCompPartial = 0
+      fragment.innerHTML = renderer(context, this._hbsRuntimeOptions)
+
+      for (const child of this.children) {
+        const stub = fragment.content.querySelector(
+          `[data-${DATA_SET_ID}="${child.id}"]`
+        )
+        if (!stub) {
+          console.error(this)
+          throw new Error(
+            `Не найден stub с id ${child.id} в компоненте ${this.name}`
+          )
+        }
+        stub.replaceWith(child.getContent())
+      }
+
+      return fragment.content
+    }
+  }
+  return extComponent
 }
-
-// function trackClass(cls, options = {}) {
-//   cls.prototype = trackObject(cls.prototype, options)
-//   cls.prototype.constructor = cls
-
-//   return new Proxy(cls, {
-//     construct(target, args) {
-//       const obj = new target(...args)
-//       return new Proxy(obj, {
-//         get: trackPropertyGet(options),
-//         set: trackPropertySet(options),
-//       })
-//     },
-//     apply: trackFunctionCall(options),
-//   })
-// }

@@ -5,13 +5,13 @@
   {{#>comp name="Card" $click="test2" title=cardProps.title }}
     {{#>slot name="default"}}
       <div $click="test">Test in block</div>
-      {{#each inputs}}
+      {{#each @root.inputs}}
         {{>comp name="Input" $input="test2" placeholder=this.placeholder }}
       {{/each}}
       {{>comp name="Input" placeholder="Вне цикла" }}
     {{/slot}}
     {{#>slot name="actions"}}
-      <div>Actions {{TestString}}</div>
+      <div>Actions {{@root.TestString}}</div>
     {{/slot}}
   {{/comp}}
   {{>comp name="Card" $click="test2" title="Card 2" }}
