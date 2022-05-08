@@ -3,11 +3,6 @@
 export { last } from './last'
 export { first } from './first'
 export { saveReplaceProperty } from './saveReplaceProperty'
-export {
-  Component,
-  ComponentExtConstructor,
-  ComponentInterface,
-  ComponentExtOptions,
-  defineComponent,
-} from './Component'
+export { Component, ComponentInterface, ComponentOptions } from './Component'
+export { defineHBSComponent } from './defineHBSComponent'
 export { EventBus } from './EventBus'

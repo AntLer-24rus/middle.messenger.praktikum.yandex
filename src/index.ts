@@ -3,18 +3,20 @@
 
 // registerPages(pages)
 // mountPage()
-import { defineComponent } from './utils'
+
+import { defineHBSComponent } from './utils'
 
 import testTemplate from './Test.hbs'
 import cardTemplate from './Card.hbs'
 import inputTemplate from './Input.hbs'
 
-const Card = defineComponent({
+const Card = defineHBSComponent({
   name: 'Card',
   renderer: cardTemplate,
   // props,
   events: {
     click(event) {
+      event.stopPropagation()
       console.log('Card event :>> ', event)
       // this.res(event)
       this.test++
@@ -25,12 +27,12 @@ const Card = defineComponent({
   }),
 })
 
-const Input = defineComponent({
+const Input = defineHBSComponent({
   name: 'Input',
   renderer: inputTemplate,
 })
 
-const Test = defineComponent({
+const Test = defineHBSComponent({
   name: 'Test',
   renderer: testTemplate,
   data: () => ({
