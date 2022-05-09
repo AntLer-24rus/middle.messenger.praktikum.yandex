@@ -11,3 +11,4 @@ export {
 } from './Component'
 export { defineHBSComponent } from './defineHBSComponent'
 export { EventBus } from './EventBus'
+export { validator } from './validator'

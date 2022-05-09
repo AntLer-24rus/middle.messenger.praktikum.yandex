@@ -97,13 +97,11 @@ export function defineHBSComponent<DataType = any, PropsType = any>(
     }
     private setSlotsAndProps(slots: ComponentSlots, props: any) {
       this._slots = slots
-      this.needUpdate = true
+      if (Object.keys(slots).length > 0) this.needUpdate = true
       this.setProps(props)
     }
     private getChild(name: string): HBSComponent {
-      let comp = this.children.filter((ch) => ch.name === name)[
-        this._indexCompPartial
-      ] as HBSComponent
+      let comp = this.children[this._indexCompPartial] as HBSComponent
       return comp
     }
     private _prepareSlot(...args: any[]): string {
@@ -133,20 +131,21 @@ export function defineHBSComponent<DataType = any, PropsType = any>(
           ([key]) => !key.startsWith(Component.EVENT_PREFIX)
         )
       )
-      const events = Object.fromEntries(
-        Object.entries(propsAndHandler)
-          .filter(([key]) => key.startsWith(Component.EVENT_PREFIX))
-          .map(([key, value]) => [
-            key.slice(Component.EVENT_PREFIX.length),
-            value,
-          ])
-      ) as Record<string, (e: Event) => void>
 
       const slots: ComponentSlots = {}
       const listeners: {
         eventName: string
         callback: (...args: any[]) => void
-      }[] = []
+      }[] =
+        Object.entries(propsAndHandler)
+          .filter(([key]) => key.startsWith(Component.EVENT_PREFIX))
+          .map(([key, value]) => ({
+            eventName: `${componentName}:${key.slice(
+              Component.EVENT_PREFIX.length
+            )}`,
+            callback: value as (...args: any[]) => void,
+          })) ?? []
+
       const collectSlotRenderer: TemplateDelegate = (...args: any[]) => {
         const {
           hash: { name: slotName },
@@ -206,8 +205,7 @@ export function defineHBSComponent<DataType = any, PropsType = any>(
 
         parentComponent.children.push(component)
       } else {
-        if (Object.keys(slots).length > 0)
-          component.setSlotsAndProps(slots, props)
+        component.setSlotsAndProps(slots, props)
       }
 
       const dataAttr = `data-${DATA_SET_ID}="${component.id}`

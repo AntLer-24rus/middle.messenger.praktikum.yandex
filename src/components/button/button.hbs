@@ -1,0 +1,12 @@
+<button 
+  class='{{classes.btn}}
+    {{#if isStroke}}
+      {{classes.btn_stroke}}
+    {{else}}
+      {{classes.btn_filled}}
+    {{/if}}
+  '
+  $click="buttonClick"
+>
+  {{text}}
+</button>

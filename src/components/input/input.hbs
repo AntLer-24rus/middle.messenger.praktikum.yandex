@@ -1,0 +1,19 @@
+<div class='{{classes.text-field}}'>
+  <label
+    class='{{classes.text-field__label}}'
+    for='{{inputName}}'
+  >{{label}}</label>
+  <input
+    class='{{classes.text-field__input}}'
+    type='{{type}}'
+    name='{{inputName}}'
+    placeholder='{{placeholder}}'
+    value='{{value}}'
+    $blur='inputBlur'
+    $focus='inputFocus'
+  />
+  <label
+    class='{{classes.text-field__error}}'
+    for='{{inputName}}'
+  >{{error}}</label>
+</div>

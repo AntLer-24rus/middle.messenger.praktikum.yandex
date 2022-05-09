@@ -4,90 +4,45 @@
 // registerPages(pages)
 // mountPage()
 
-import { defineHBSComponent } from './utils'
+import DevPanel from './modules/dev-panel'
 
-import testTemplate from './Test.hbs'
-import cardTemplate from './Card.hbs'
-import inputTemplate from './Input.hbs'
+import LoginPage from './pages/login'
 
-const Card = defineHBSComponent({
-  name: 'Card',
-  renderer: cardTemplate,
-  props: {
-    title: 'DEfault card title',
-  },
-  nativeEvents: {
-    click(event) {
-      event.stopPropagation()
-      console.log('Card event :>> ', event)
-      // this.res(event)
-      this.test++
-      this.title = `${this.title} (${this.test})`
-    },
-  },
-  data: () => ({
-    test: 1,
-  }),
-})
+document.addEventListener('DOMContentLoaded', () => {
+  // if (process.env.NODE_ENV !== 'production') {
+  const app = document.querySelector('#app') as HTMLElement
+  app.style.height = 'calc(100vh - 55px)'
+  const body = document.querySelector('body') as HTMLBodyElement
+  const devPanelEL = document.createElement('div')
+  devPanelEL.id = 'dev-panel'
+  body.insertAdjacentElement('afterbegin', devPanelEL)
 
-const Input = defineHBSComponent({
-  name: 'Input',
-  renderer: inputTemplate,
-  props: {},
-  nativeEvents: {
-    keyup(event) {
-      event.stopPropagation()
-      const input = event.target as HTMLInputElement
-      console.log('Event in Input :>> ', input.value)
-      // this.value = input.value
-    },
-  },
-})
+  // }
 
-const Test = defineHBSComponent({
-  name: 'Test',
-  renderer: testTemplate,
-  props: {},
-  data: () => ({
-    TestString: 'Test string from template',
-    cardTitle: 'Card title',
-    inputs: [
+  const pages = [{ href: '/login', text: 'login', Comp: LoginPage }]
+  let page
+
+  const devPanel = new DevPanel({
+    props: { pages },
+    listeners: [
       {
-        placeholder: 'ведите текст',
-      },
-      {
-        placeholder: 'ведите текст 2',
-      },
-      {
-        placeholder: 'ведите текст 3',
+        eventName: 'update-page',
+        callback: (href: string) => {
+          window.history.pushState(null, '', href)
+          const baseTitle = document.title.replace(/\s\|.*/gm, '')
+          const Page = pages.find((p) => p.href === href)
+          if (href === '/') {
+            document.title = `${baseTitle} | home`
+          } else if (Page) {
+            document.title = `${baseTitle} | ${Page.text}`
+            page = new Page.Comp({})
+            page.mount('#app')
+          }
+        },
       },
     ],
-  }),
-  nativeEvents: {
-    // click: (event) => {
-    //   console.log('Test event :>> ', event)
-    // },
-    test2(event) {
-      console.log('Event in Test test2 :>>', this)
-    },
-    test(event) {
-      event.stopPropagation()
-      console.log('Event in Test test :>>', this)
-      this.cardTitle = 'te1'
-    },
-  },
-  components: [Card, Input],
-})
-
-const test = new Test({})
-
-test.mount('#app')
-
-console.log('SUCCESS', test)
-
-setTimeout(() => {
-  test.setProps({
-    TestString: 'Test string from template 1',
-    cardTitle: 'Changed title',
   })
-}, 5000)
+  devPanel.mount('#dev-panel')
+  page = new LoginPage({})
+  page.mount('#app')
+})

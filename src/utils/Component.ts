@@ -7,8 +7,14 @@ export interface ComponentOptions<DataType = any, PropsType = any> {
   parent?: Component
   props?: PropsType
   data?: () => DataType
-  listeners?: { eventName: string; callback: () => void }[]
-  events?: Record<string, (this: DataType & PropsType, e: Event) => void>
+  listeners?: { eventName: string; callback: (...args: any[]) => void }[]
+  events?: Record<
+    string,
+    (
+      this: DataType & PropsType & { emit: Component<DataType>['emit'] },
+      e: Event
+    ) => void
+  >
 }
 
 type ComponentMeta = {
@@ -59,8 +65,9 @@ export abstract class Component<DataType = any> implements ComponentInterface {
     this._meta = { name, id: uuid() }
     this._parent = parent
 
+    const prepData = data.call(props)
     this.data = new Proxy(
-      { ...data(), ...props },
+      { ...prepData, ...props },
       {
         set: (target, prop, value) => {
           if (Object.prototype.hasOwnProperty.call(target, prop)) {
@@ -88,6 +95,7 @@ export abstract class Component<DataType = any> implements ComponentInterface {
 
   protected abstract render(context: any): DocumentFragment
   private _render() {
+    // console.log(`Render ${this.name}.${this.id}`)
     const fragment = this.render({ ...this.data })
 
     const first = fragment.firstElementChild
@@ -110,7 +118,7 @@ export abstract class Component<DataType = any> implements ComponentInterface {
     if (this.needUpdate) this._eventBus.emit(BASE_COMPONENT_EVENTS.RENDER)
   }
 
-  protected emit(eventName: BASE_COMPONENT_EVENTS, ...args: any) {
+  protected emit(eventName: string, ...args: any) {
     this._eventBus.emit(eventName, ...args)
   }
   private _registerEvents(
@@ -124,7 +132,7 @@ export abstract class Component<DataType = any> implements ComponentInterface {
     )
     this._eventBus.on(BASE_COMPONENT_EVENTS.UPDATE, this._update.bind(this))
     for (const listener of listeners) {
-      this._eventBus.on(listener.eventName, listener.callback)
+      this._eventBus.on(listener.eventName, listener.callback.bind(this))
     }
   }
   private _addNativeEventListener(
@@ -149,8 +157,12 @@ export abstract class Component<DataType = any> implements ComponentInterface {
     method: (...args: any[]) => void,
     ...args: any[]
   ): void {
-    const eventThis = { ...this.data }
+    const eventThis: DataType & { emit?: any } = {
+      ...this.data,
+      emit: this.emit.bind(this),
+    }
     method.call(eventThis, ...args)
+    delete eventThis.emit
     Object.assign(this.data, eventThis)
     if (this.needUpdate) this.emit(BASE_COMPONENT_EVENTS.RENDER)
   }
@@ -161,8 +173,18 @@ export abstract class Component<DataType = any> implements ComponentInterface {
     return [eventName, callbackName]
   }
   private _addEvents(element: Element = this.element) {
+    let removeAttr = []
+    for (const attr of element.attributes) {
+      if (attr.name.startsWith(Component.EVENT_PREFIX)) {
+        this._addNativeEventListener(element, ...this._parseAttr(attr))
+        removeAttr.push(attr)
+      }
+    }
+    removeAttr.forEach((attr) => {
+      element.removeAttributeNode(attr)
+    })
     for (const child of element.children) {
-      const removeAttr = []
+      removeAttr = []
       for (const attr of child.attributes) {
         if (attr.name.startsWith(Component.EVENT_PREFIX)) {
           this._addNativeEventListener(child, ...this._parseAttr(attr))
@@ -221,6 +243,7 @@ export abstract class Component<DataType = any> implements ComponentInterface {
     const mountPoint = document.querySelector(selector)
     if (!mountPoint)
       throw new Error(`В документе не найден селектор ${selector}`)
+    mountPoint.innerHTML = ''
     mountPoint.append(this.getContent())
   }
 }
