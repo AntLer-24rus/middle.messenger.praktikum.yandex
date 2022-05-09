@@ -1,5 +1,9 @@
 <div class='{{classes.card}} {{className}}'>
-  <div class='{{classes.card__title}}'>{{title}}</div>
+  <div class='{{classes.card__title}}'>
+    {{#>slot name="title"}}
+      {{@root.title}}
+    {{/slot}}
+  </div>
   <div class='{{classes.card__body}}'>
     {{>slot name='body'}}
   </div>
