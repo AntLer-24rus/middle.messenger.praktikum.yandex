@@ -1,13 +1,12 @@
-import template from './login.hbs'
+import renderer from './login.hbs'
 import * as classes from './style.module.scss'
-// import { textField, button } from '../../modules'
 import { defineHBSComponent, validator } from '../../utils'
 import { Button, TextField, Card } from '../../components'
 
 export default defineHBSComponent({
   name: 'LoginPage',
   components: [TextField, Button, Card],
-  renderer: template,
+  renderer,
   props: {},
   data: () => ({
     classes,
@@ -58,11 +57,12 @@ export default defineHBSComponent({
         }
       }
       this.inputs = localInputs
-      console.log('form :>> ', {
+      const formData = {
         data,
         valid: this.inputs.every((i) => !i.error),
         errors: Object.fromEntries(this.inputs.map((i) => [i.name, i.error])),
-      })
+      }
+      console.log('form :>> ', formData)
     },
   },
 })

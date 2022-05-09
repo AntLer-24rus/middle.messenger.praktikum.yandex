@@ -3,6 +3,13 @@ type Validator = {
   error: string
 }
 
+const name_validators: Validator[] = [
+  {
+    handler: (val) => !/^[A-ZА-Я]{1}[a-zA-Zа-яА-Я-]*$/gm.test(val),
+    error: 'A-z, А-я, первая буква должна быть заглавной',
+  },
+]
+
 const validatorsGlobal: {
   [key: string]: Validator[]
 } = {
@@ -27,7 +34,7 @@ const validatorsGlobal: {
   password: [
     {
       handler: (val) => val.length < 8,
-      error: 'Пароль слишком короткий, от 8х символов',
+      error: 'Пароль слишком короткий, от 8и символов',
     },
     {
       handler: (val) => val.length > 40,
@@ -42,12 +49,32 @@ const validatorsGlobal: {
       error: 'Пароль должен содержать хотя бы цифру',
     },
   ],
+  first_name: name_validators,
+  second_name: name_validators,
+  email: [
+    {
+      handler: (val) => !/^[0-9A-z]+@[0-9A-z]+\..+$/gm.test(val),
+      error: 'Не верный формат',
+    },
+  ],
+  phone: [
+    {
+      handler: (val) => !/^\+?\d{10,15}$/gm.test(val),
+      error: 'Неверный формат номера',
+    },
+  ],
+  message: [
+    {
+      handler: (val) => !!val,
+      error: 'Сообщение пустое',
+    },
+  ],
 }
 
 export function validator(fieldName: string, value: string): string {
   const validators = validatorsGlobal[fieldName]
   if (!validators) {
-    console.warn(`Неизвестное имея поля ${fieldName}`)
+    console.warn(`Неизвестное имя поля ${fieldName}`)
     return ''
   }
   for (const { handler, error } of validators) {
