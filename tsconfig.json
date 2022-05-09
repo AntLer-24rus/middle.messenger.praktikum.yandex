@@ -11,8 +11,7 @@
     "noUnusedParameters": false,
     "sourceMap": true,
     "strictNullChecks": true,
-    "plugins": [{ "name": "typescript-plugin-css-modules" }],
-    "outDir": "dist"
+    "plugins": [{ "name": "typescript-plugin-css-modules" }]
   },
   //"include": ["src/**/*.ts", "src/**/*.d.ts"]
   "include": ["src/utils/Component.ts", "src/env.d.ts", "src/index.ts"]

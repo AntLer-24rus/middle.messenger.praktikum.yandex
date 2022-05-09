@@ -5,11 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch firefox debug",
       "type": "firefox",
       "request": "launch",
-      "name": "Launch Firefox against localhost",
-      "url": "http://localhost:1234",
-      "webRoot": "${workspaceFolder}/dist",
+      "reAttach": true,
+      "url": "http://localhost:1234/",
+      "webRoot": "${workspaceFolder}/src",
       "breakOnLoad": true,
       "sourceMapPathOverrides": {
         "/__parcel_source_root/*": "${webRoot}/*"
@@ -24,14 +25,15 @@
     {
       "type": "chrome",
       "request": "launch",
+      "reAttach": true,
       "name": "Debug TS, Parcel app in Chrome",
       "url": "http://localhost:1234/",
-      "webRoot": "${workspaceFolder}/src",
-      "pathMapping": {
-        "__parcel_source_root": "${workspaceFolder}/src"
+      "webRoot": "${workspaceFolder}",
+      "sourceMapPathOverrides": {
+        "/__parcel_source_root/*": "${webRoot}/*"
       },
       "skipFiles": [
-        "${workspaceFolder}/parcel/node_modules/**/*.js",
+        "${workspaceFolder}/dist/node_modules/**/*.js",
         "<node_internals>/**/*.js"
       ]
     }

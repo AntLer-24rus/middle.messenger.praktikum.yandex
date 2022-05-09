@@ -1,13 +1,14 @@
+import { registerHelper } from 'handlebars'
 import { v4 as uuid } from 'uuid'
 import { EventBus } from './index'
 
-export interface ComponentOptions<DataType = any> {
+export interface ComponentOptions<DataType = any, PropsType = any> {
   name: string
   parent?: Component
-  props?: any
+  props?: PropsType
   data?: () => DataType
   listeners?: { eventName: string; callback: () => void }[]
-  events?: Record<string, (this: DataType, e: Event) => void>
+  events?: Record<string, (this: DataType & PropsType, e: Event) => void>
 }
 
 type ComponentMeta = {
@@ -21,39 +22,40 @@ export interface ComponentInterface {
   id: string
 }
 
-const enum EVENTS {
+export const enum BASE_COMPONENT_EVENTS {
   RENDER = 'render',
   MOUNTED = 'mounted',
   UPDATE = 'update',
   UPDATED = 'updated',
   NATIVE_EVENT = 'native:event',
 }
-export abstract class Component implements ComponentInterface {
-  [key: string | symbol]: any
+
+const enum t {}
+export abstract class Component<DataType = any> implements ComponentInterface {
+  static EVENT_PREFIX: string = '$'
+  // [key: string | symbol]: any
   private _meta: ComponentMeta
   private _element: Element | null = null
-  protected data: any
+  protected data: DataType
   private _events: Record<string, (e: Event) => void> = {}
   private _eventBus: EventBus = new EventBus()
   private _parent: Component | undefined = undefined
-  // private _slots: ComponentSlots
   private _children: Component[] = []
-  // private _renderer: Function
   private _nativeListeners: {
     el: Element
     eventName: string
     callback: (e: Event) => void
   }[] = []
-  // private _hbsRuntimeOptions: RuntimeOptions
+  protected needUpdate: boolean = false
 
   constructor({
     name,
     parent,
     props = {},
-    data = () => ({}),
+    data = (): any => ({}),
     events = {},
     listeners,
-  }: ComponentOptions) {
+  }: ComponentOptions<DataType>) {
     this._meta = { name, id: uuid() }
     this._parent = parent
 
@@ -61,21 +63,21 @@ export abstract class Component implements ComponentInterface {
       { ...data(), ...props },
       {
         set: (target, prop, value) => {
-          console.log(`set ${this.name}`, prop, value)
-          target[prop] = value
-
-          this._eventBus.emit(EVENTS.RENDER)
-          return true
+          if (Object.prototype.hasOwnProperty.call(target, prop)) {
+            const updated =
+              JSON.stringify(target[prop]) !== JSON.stringify(value)
+            if (updated) {
+              this.needUpdate = true
+              target[prop] = value
+              return true
+            }
+            return true
+          }
+          return false
         },
       }
     )
-
-    for (const key in events) {
-      if (Object.prototype.hasOwnProperty.call(events, key)) {
-        const element = events[key]
-        this._events[key] = element.bind(this.data)
-      }
-    }
+    this._events = events
 
     this._registerEvents(listeners)
   }
@@ -100,58 +102,99 @@ export abstract class Component implements ComponentInterface {
     this._element = first
 
     this._addEvents()
+    this.needUpdate = false
   }
 
   private _update(data: any) {
-    console.log('new data :>> ', data)
     Object.assign(this.data, data)
+    if (this.needUpdate) this._eventBus.emit(BASE_COMPONENT_EVENTS.RENDER)
   }
 
-  protected init() {
-    this._eventBus.emit(EVENTS.RENDER)
+  protected emit(eventName: BASE_COMPONENT_EVENTS, ...args: any) {
+    this._eventBus.emit(eventName, ...args)
   }
-
   private _registerEvents(
     listeners: { eventName: string; callback: () => void }[] = []
   ) {
-    this._eventBus.on(EVENTS.RENDER, this._render.bind(this))
-    this._eventBus.on(EVENTS.MOUNTED, () => {})
-    this._eventBus.on(EVENTS.NATIVE_EVENT, (methodName: string, e: Event) => {
-      const method = this[methodName]
-      if (this[methodName] && typeof this[methodName] === 'function')
-        method.call(this, e)
-      else console.warn(`Не найден ни один обработчик с именем ${methodName}`)
-    })
-    this._eventBus.on(EVENTS.UPDATE, this._update.bind(this))
+    this._eventBus.on(BASE_COMPONENT_EVENTS.RENDER, this._render.bind(this))
+    this._eventBus.on(BASE_COMPONENT_EVENTS.MOUNTED, () => {})
+    this._eventBus.on(
+      BASE_COMPONENT_EVENTS.NATIVE_EVENT,
+      this._callNativeEvent.bind(this)
+    )
+    this._eventBus.on(BASE_COMPONENT_EVENTS.UPDATE, this._update.bind(this))
     for (const listener of listeners) {
       this._eventBus.on(listener.eventName, listener.callback)
     }
   }
-
-  private _addEventListener(
+  private _addNativeEventListener(
     el: Element,
     eventName: string,
     callbackName: string
   ) {
     const callback = (event: Event) =>
-      this._eventBus.emit(EVENTS.NATIVE_EVENT, callbackName, event)
+      this.emit(BASE_COMPONENT_EVENTS.NATIVE_EVENT, callbackName, event)
     el.addEventListener(eventName, callback)
     this._nativeListeners.push({ el, eventName, callback })
   }
+  private _callNativeEvent(methodName: string, e: Event) {
+    const method = this._events[methodName]
+    if (method && typeof method === 'function') {
+      this.callEventInContext(method, e)
+    } else {
+      this._eventBus.emit(methodName, e)
+    }
+  }
+  protected callEventInContext(
+    method: (...args: any[]) => void,
+    ...args: any[]
+  ): void {
+    const eventThis = { ...this.data }
+    method.call(eventThis, ...args)
+    Object.assign(this.data, eventThis)
+    if (this.needUpdate) this.emit(BASE_COMPONENT_EVENTS.RENDER)
+  }
 
-  private _addEvents() {
-    if (!this._element)
-      throw new Error('Установка обработчиков до создания компонента')
-    Object.keys(this._events).forEach((eventName) => {
-      this._element!.addEventListener(eventName, this._events[eventName])
-    })
+  private _parseAttr(attr: Attr): [string, string] {
+    const eventName = attr.name.slice(Component.EVENT_PREFIX.length)
+    const callbackName = attr.value
+    return [eventName, callbackName]
+  }
+  private _addEvents(element: Element = this.element) {
+    for (const child of element.children) {
+      const removeAttr = []
+      for (const attr of child.attributes) {
+        if (attr.name.startsWith(Component.EVENT_PREFIX)) {
+          this._addNativeEventListener(child, ...this._parseAttr(attr))
+          removeAttr.push(attr)
+        }
+      }
+      removeAttr.forEach((attr) => {
+        child.removeAttributeNode(attr)
+      })
+      this._addEvents(child)
+    }
+
+    // Object.keys(this._events).forEach((eventName) => {
+    //   this._element!.addEventListener(eventName, this._events[eventName])
+    // })
   }
   private _removeEvents() {
-    if (!this._element)
-      throw new Error('Удаление обработчиков до создания компонента')
-    Object.keys(this._events).forEach((eventName) => {
-      this._element!.removeEventListener(eventName, this._events[eventName])
-    })
+    let listener = this._nativeListeners.pop()
+    while (listener) {
+      listener.el.removeEventListener(listener.eventName, listener.callback)
+      listener = this._nativeListeners.pop()
+    }
+    // if (!this._element)
+    //   throw new Error('Удаление обработчиков до создания компонента')
+    // Object.keys(this._events).forEach((eventName) => {
+    //   this._element!.removeEventListener(eventName, this._events[eventName])
+    // })
+  }
+
+  protected get element(): Element {
+    if (!this._element) throw new Error('Элемент еще не создан')
+    return this._element
   }
 
   // Public interface --------------------------------------------
@@ -168,17 +211,7 @@ export abstract class Component implements ComponentInterface {
     return this._meta.id
   }
   public setProps(data: any) {
-    this._eventBus.emit(EVENTS.UPDATE, data)
-    // for (const key in data) {
-    //   if (
-    //     Object.prototype.hasOwnProperty.call(data, key) &&
-    //     Object.prototype.hasOwnProperty.call(this._data, key)
-    //   ) {
-    //     if (JSON.stringify(this._data[key]) !== JSON.stringify(data[key])) {
-    //       this._data[key] = data[key]
-    //     }
-    //   }
-    // }
+    this._eventBus.emit(BASE_COMPONENT_EVENTS.UPDATE, data)
   }
   public mount(selector: string) {
     if (this._parent)
