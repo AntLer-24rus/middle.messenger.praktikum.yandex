@@ -74,6 +74,7 @@ export function defineHBSComponent<DataType = any, PropsType = any>(
         props,
         events: options.nativeEvents,
         listeners: hbsOptions.listeners,
+        parent: hbsOptions.parent,
       })
       // for (const key in hbsOptions.events) {
       //   if (Object.prototype.hasOwnProperty.call(hbsOptions.events, key)) {

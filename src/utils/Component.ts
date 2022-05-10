@@ -92,6 +92,9 @@ export abstract class Component<DataType = any> implements ComponentInterface {
   public get children() {
     return this._children
   }
+  public get parent() {
+    return this._parent
+  }
 
   protected abstract render(context: any): DocumentFragment
   private _render() {

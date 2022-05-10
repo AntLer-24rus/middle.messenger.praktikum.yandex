@@ -3,15 +3,15 @@
     class='{{classes.text-field__label}}'
     for='{{inputName}}'
   >{{label}}</label>
-  <input
-    class='{{classes.text-field__input}}'
-    type='{{type}}'
-    name='{{inputName}}'
-    placeholder='{{placeholder}}'
-    value='{{value}}'
-    $blur='inputBlur'
-    $focus='inputFocus'
-  />
+  {{>comp name="Input"
+      className=classes.text-field__input
+      inputName=inputName 
+      placeholder=placeholder
+      type=type
+      validate=validate
+      $blur=validateInput
+      $focus=validateInput
+  }}
   <label
     class='{{classes.text-field__error}}'
     for='{{inputName}}'
