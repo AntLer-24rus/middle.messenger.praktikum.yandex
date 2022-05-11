@@ -6,10 +6,9 @@
 
 import DevPanel from './modules/dev-panel'
 
-import LoginPage from './pages/login'
-import RegistrationPage from './pages/registration'
 import ErrorPage from './pages/error'
-import { Component } from './utils'
+import type { Component } from './utils'
+import { pages } from './pages'
 
 document.addEventListener('DOMContentLoaded', () => {
   // if (process.env.NODE_ENV !== 'production') {
@@ -22,12 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // }
 
-  const pages = [
-    { href: '/login', text: 'login', Comp: LoginPage },
-    { href: '/registration', text: 'registration', Comp: RegistrationPage },
-    { href: '/error', text: 'error', Comp: ErrorPage },
-    { href: '/unknown', text: 'unknown', Comp: ErrorPage },
-  ]
   let page: Component
   function renderPage(href: string) {
     window.history.pushState(null, '', href)
@@ -35,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const Page = pages.find((p) => p.href === href)
     if (href === '/') {
       document.title = `${baseTitle} | home`
-      page = new LoginPage({})
+      page = new pages[0].Comp({})
     } else if (Page) {
       document.title = `${baseTitle} | ${Page.text}`
       let props = {}

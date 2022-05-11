@@ -1,13 +1,13 @@
-import { loginPage } from './login/login'
-import { registrationPage } from './registration/registration'
-import { chatsPage } from './chats/chats'
-import { errorPage } from './error/error'
-import { profilePage } from './profile/profile'
+import LoginPage from './login/login'
+import RegistrationPage from './registration/registration'
+import ChatsPage from './chats/chats'
+import ErrorPage from './error/error'
+// import profilePage from './profile/profile'
 
-export const pages = new Map([
-  ['/login', loginPage],
-  ['/registration', registrationPage],
-  ['/chats', chatsPage],
-  ['/profile', profilePage],
-  ['error', errorPage],
-])
+export const pages = [
+  { href: '/login', text: 'login', Comp: LoginPage },
+  { href: '/registration', text: 'registration', Comp: RegistrationPage },
+  { href: '/chats', text: 'chats', Comp: ChatsPage },
+  { href: '/error', text: 'error', Comp: ErrorPage },
+  { href: '/unknown', text: 'unknown', Comp: ErrorPage },
+]
