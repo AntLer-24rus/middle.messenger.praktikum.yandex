@@ -11,12 +11,21 @@
   &_filled {
     color: $color-white;
     background-color: $color-primary;
+    &:hover {
+      background-color: darken($color: $color-primary, $amount: 13);
+    }
   }
 
   &_stroke {
     color: $color-primary;
     border: 1px solid $color-primary;
+    background-color: lighten($color: $color-primary, $amount: 33);
     box-sizing: border-box;
     border-radius: 4px;
+    &:hover {
+      color: $color-white;
+      border: none;
+      background-color: $color-primary;
+    }
   }
 }
