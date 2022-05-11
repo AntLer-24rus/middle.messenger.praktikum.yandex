@@ -3,6 +3,7 @@
 .text-field {
   font-size: $extra-slam-text;
   &__label {
+    height: 11px;
     display: block;
 
     padding-left: 7px;
@@ -12,6 +13,10 @@
   &__input {
     display: block;
     background: none;
+
+    &::placeholder {
+      color: $color-placeholder-text;
+    }
     font-size: $base-text;
     width: 100%;
     border: 1px solid $color-border;
