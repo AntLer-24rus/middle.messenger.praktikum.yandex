@@ -1,5 +1,5 @@
 import renderer from './button.hbs'
-import classes from './style.module.scss'
+import * as classes from './style.module.scss'
 import { defineHBSComponent } from '../../utils'
 
 export default defineHBSComponent({

@@ -1,5 +1,5 @@
 import renderer from './icon.hbs'
-import classes from './icon.module.scss'
+import * as classes from './icon.module.scss'
 
 import { defineHBSComponent } from '../../utils'
 

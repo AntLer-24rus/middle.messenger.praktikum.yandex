@@ -1,5 +1,5 @@
 import renderer from './text-field.hbs'
-import classes from './text-field.module.scss'
+import * as classes from './text-field.module.scss'
 import { defineHBSComponent, last, Component } from '../../utils'
 import Input from './modules/input'
 import Label from './modules/label'

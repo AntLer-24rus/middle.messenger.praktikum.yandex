@@ -1,5 +1,5 @@
 import renderer from './chats-list.hbs'
-import classes from './chats-list.module.scss'
+import * as classes from './chats-list.module.scss'
 import { defineHBSComponent } from '../../../../utils'
 import ChatPreview from '../chat-preview'
 

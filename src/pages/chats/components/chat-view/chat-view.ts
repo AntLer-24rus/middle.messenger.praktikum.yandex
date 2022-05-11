@@ -1,5 +1,5 @@
 import renderer from './chat-view.hbs'
-import classes from './chat-view.module.scss'
+import * as classes from './chat-view.module.scss'
 import { defineHBSComponent } from '../../../../utils'
 import Message from '../message'
 import { Icon, TextField } from '../../../../components'
