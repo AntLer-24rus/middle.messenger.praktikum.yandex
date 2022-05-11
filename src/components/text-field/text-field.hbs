@@ -1,8 +1,9 @@
 <div class='{{classes.text-field}}'>
-  <label
-    class='{{classes.text-field__label}}'
-    for='{{inputName}}'
-  >{{label}}</label>
+  {{>comp name="Label"
+      className=classes.text-field__label
+      inputName=inputName
+      text=label
+  }}
   {{>comp name="Input"
       className=classes.text-field__input
       inputName=inputName 
@@ -12,8 +13,9 @@
       $blur=validateInput
       $focus=validateInput
   }}
-  <label
-    class='{{classes.text-field__error}}'
-    for='{{inputName}}'
-  >{{error}}</label>
+  {{>comp name="Label"
+      className=classes.text-field__error
+      inputName=inputName
+      text=error
+  }}
 </div>
