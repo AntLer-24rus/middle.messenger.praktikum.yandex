@@ -1,0 +1,51 @@
+{{#*inline "setting"}}
+  <svg
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    fill='none'
+    xmlns='http://www.w3.org/2000/svg'
+  >
+    <path
+      fill-rule='evenodd'
+      clip-rule='evenodd'
+      d='M18.9276 3.99969L15.4646 2.00034C14.773 3.19575 13.4804 4 12 4C10.5195 4 9.22696 3.19575 8.53529 2.00034L5.07233 3.99968C5.76175 5.19639 5.81196 6.71792 5.07175 8.00001C4.33154 9.28209 2.98876 9.99938 1.60767 10.0007V13.9993C2.98876 14.0006 4.33154 14.7179 5.07175 16C5.81196 17.2821 5.76175 18.8036 5.07233 20.0003L8.53529 21.9997C9.22696 20.8042 10.5195 20 12 20C13.4804 20 14.773 20.8042 15.4646 21.9997L18.9276 20.0003C18.2382 18.8036 18.188 17.2821 18.9282 16C19.6684 14.7179 21.0112 14.0006 22.3923 13.9993V10.0007C21.0112 9.99937 19.6684 9.28208 18.9282 8.00001C18.188 6.71793 18.2382 5.1964 18.9276 3.99969ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79083 8 7.99997 9.79086 7.99997 12C7.99997 14.2091 9.79083 16 12 16Z'
+      stroke-width='2'
+    ></path>
+  </svg>
+{{/inline}}
+
+{{#*inline "trash"}}
+  <svg
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    fill='none'
+    xmlns='http://www.w3.org/2000/svg'
+  >
+    xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 7H18V21C18 21.5523 17.5523 22 17 22H7C6.44771 22 6 21.5523 6 21V7Z" stroke-width="2" stroke-linejoin="round"/>
+    <line x1="10" y1="10" x2="10" y2="19" stroke-width="2"/>
+    <line x1="4" y1="4" x2="20" y2="4" stroke-width="2"/>
+    <line x1="9" y1="3" x2="15" y2="3" stroke-width="2"/>
+    <line x1="14" y1="10" x2="14" y2="19" stroke-width="2"/>
+  </svg>
+{{/inline}}
+
+{{#*inline "info"}}
+  <svg
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    fill='none'
+    xmlns='http://www.w3.org/2000/svg'
+  >
+    <circle cx="12" cy="12" r="10" stroke-width="2" />
+    <line x1="12.0833" y1="11.0833" x2="12.0833" y2="16.5833" stroke-width="2" />
+    <line x1="12.0833" y1="7.41666" x2="12.0833" y2="9.24999" stroke-width="2" />
+  </svg>
+{{/inline}}
+
+<span class='{{classes.icon}} {{className}}' $click="iconClick">
+  {{>(lookup . "iconName")}}
+</span>
