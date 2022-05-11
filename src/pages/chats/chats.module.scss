@@ -1,0 +1,44 @@
+@import '../../utils/variables.scss';
+
+.chats-page {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  padding: 5px;
+
+  .chats-preview {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 345px;
+    background: $color-gray-extra-light;
+    border-radius: 7px;
+
+    margin-right: 5px;
+
+    &__header {
+      display: flex;
+      align-items: center;
+      margin-top: 25px;
+      margin-left: 25px;
+      margin-right: 12px;
+      margin-bottom: 20px;
+
+      .search-field {
+        margin-left: 23px;
+        flex-grow: 1;
+        input {
+          background-color: $color-gray-light;
+          border-color: $color-gray-light;
+        }
+      }
+    }
+
+    &__chats-list {
+      flex-grow: 1;
+    }
+  }
+  .chat-view {
+    flex-grow: 1;
+  }
+}
