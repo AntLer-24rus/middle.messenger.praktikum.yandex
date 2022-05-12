@@ -1,8 +1,8 @@
 import renderer from './chat-view.hbs'
 import * as classes from './chat-view.module.scss'
-import { defineHBSComponent } from '../../../../utils'
+import { Component, defineHBSComponent } from '../../../../utils'
 import Message from '../message'
-import { Icon, TextField } from '../../../../components'
+import { Icon, TextField, Overlay, Card } from '../../../../components'
 
 type ChatViewProps = {
   classes: typeof classes
@@ -14,11 +14,11 @@ export default defineHBSComponent<ChatViewData, ChatViewProps>({
   name: 'ChatView',
   renderer,
   props: { classes, className: '' },
-  components: [Message, Icon, TextField],
+  components: [Message, Icon, TextField, Overlay, Card],
   data() {
     return {
-      showChatInfo() {
-        console.log('Показать информацию чата')
+      showChatInfo(this: Component, e: Event) {
+        this.parent!.emit('ChatView:showChatInfo', e)
       },
     }
   },

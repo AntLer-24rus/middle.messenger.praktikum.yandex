@@ -1,15 +1,17 @@
 import renderer from './chats.hbs'
 import * as classes from './chats.module.scss'
-import { defineHBSComponent } from '../../utils'
+import { Component, defineHBSComponent } from '../../utils'
 import ChatList from './components/chats-list'
 import ChatView from './components/chat-view'
 import { TextField, Icon } from '../../components'
+import UserList from './components/user-list'
+import Profile from './components/profile'
 
 export default defineHBSComponent({
   name: 'Chats',
   renderer,
   props: { classes },
-  components: [TextField, Icon, ChatList, ChatView],
+  components: [TextField, Icon, ChatList, ChatView, UserList, Profile],
   data: () => ({
     chats: [
       {
@@ -66,9 +68,17 @@ export default defineHBSComponent({
         date: new Date('2005-08-09T18:38:23'),
       },
     ],
-    openSetting(e: Event) {
+    openSetting(this: Component, e: Event) {
       e.preventDefault()
-      console.log('Open settings')
+      const chats = this.getParentByName('Chats')!
+      const profile = chats.getChildrenByName('Profile')!
+      profile.setProps({ isHide: false })
+    },
+    showChatInfoRoot(this: Component, e: Event) {
+      e.preventDefault()
+      const chats = this.getParentByName('Chats')!
+      const userList = chats.getChildrenByName('UserList')!
+      userList.show()
     },
   }),
 })
