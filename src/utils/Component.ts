@@ -217,9 +217,9 @@ export abstract class Component<DataType = any> implements ComponentInterface {
     // })
   }
 
-  protected get element(): Element {
+  protected get element(): HTMLElement {
     if (!this._element) throw new Error('Элемент еще не создан')
-    return this._element
+    return this._element as HTMLElement
   }
 
   // Public interface --------------------------------------------
