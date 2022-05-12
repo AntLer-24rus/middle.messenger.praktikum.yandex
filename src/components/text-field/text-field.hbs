@@ -1,4 +1,4 @@
-<div class='{{classes.text-field}} {{className}}'>
+<div class="{{classes.text-field}} {{className}}">
   {{>comp name="Label"
       className=classes.text-field__label
       inputName=inputName
@@ -8,8 +8,10 @@
       className=classes.text-field__input
       inputName=inputName 
       placeholder=placeholder
+      value=value
       type=type
       validate=validate
+      disabled=disabled
       $blur=validateInput
       $focus=validateInput
   }}

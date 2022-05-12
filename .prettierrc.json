@@ -4,5 +4,14 @@
   "bracketSpacing": true,
   "singleQuote": true,
   "printWidth": 80,
-  "tabWidth": 2
+  "tabWidth": 2,
+  "overrides": [
+    {
+      "files": ["*.hbs", "*.html"],
+      "options": {
+        "singleQuote": false,
+        "htmlWhitespaceSensitivity": "ignore"
+      }
+    }
+  ]
 }

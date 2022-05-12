@@ -1,10 +1,10 @@
-<div class='{{classes.error-page}}'>
+<div class="{{classes.error-page}}">
   {{#>comp name="Card" className=classes.error-page__card}}
     {{#>slot name="title"}}
       <span class="{{classes.error-page__code}}">{{code}}</span>
     {{/slot}}
     {{#>slot name="body"}}
-      <p class='{{classes.error-page__message}}'>{{textError}}</p>
+      <p class="{{classes.error-page__message}}">{{textError}}</p>
       <div class="{{classes.error-page__button}}">
         {{>comp name="Button" text=buttonText type=buttonType $click=btnClick}}
       </div>
