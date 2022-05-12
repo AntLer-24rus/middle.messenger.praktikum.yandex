@@ -26,7 +26,7 @@ export class EventBus {
   emit(event: string, ...args: any) {
     if (!this._listeners[event]) {
       // throw new Error(`Нет события: ${event}`)
-      console.warn(`Нет события: ${event}`)
+      console.error(`Нет события: ${event}`)
       return
     }
 
