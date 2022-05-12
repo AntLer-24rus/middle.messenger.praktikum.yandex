@@ -121,7 +121,7 @@ export abstract class Component<DataType = any> implements ComponentInterface {
     if (this.needUpdate) this._eventBus.emit(BASE_COMPONENT_EVENTS.RENDER)
   }
 
-  protected emit(eventName: string, ...args: any) {
+  public emit(eventName: string, ...args: any) {
     this._eventBus.emit(eventName, ...args)
   }
   private _registerEvents(
@@ -223,6 +223,13 @@ export abstract class Component<DataType = any> implements ComponentInterface {
   }
 
   // Public interface --------------------------------------------
+
+  public show() {
+    this.element.style.display = ''
+  }
+  public hide() {
+    this.element.style.display = 'none'
+  }
   public getContent() {
     const content = this._element
     if (!content)
@@ -234,6 +241,16 @@ export abstract class Component<DataType = any> implements ComponentInterface {
   }
   public get id() {
     return this._meta.id
+  }
+
+  public getParentByName(name: string): Component | null {
+    if (this.name === name) return this
+    const parent = this.parent
+    if (!parent) return null
+    return parent.getParentByName(name)
+  }
+  public getChildrenByName(name: string): Component | undefined {
+    return this.children.find((c) => c.name === name)
   }
   public setProps(data: any) {
     this._eventBus.emit(BASE_COMPONENT_EVENTS.UPDATE, data)
