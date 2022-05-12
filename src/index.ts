@@ -1,9 +1,3 @@
-// import { pages } from './pages'
-// import { mountPage, registerPages } from './utils'
-
-// registerPages(pages)
-// mountPage()
-
 import DevPanel from './modules/dev-panel'
 
 import ErrorPage from './pages/error'
@@ -11,15 +5,14 @@ import type { Component } from './utils'
 import { pages } from './pages'
 
 document.addEventListener('DOMContentLoaded', () => {
-  // if (process.env.NODE_ENV !== 'production') {
-  const app = document.querySelector('#app') as HTMLElement
-  app.style.height = 'calc(100vh - 55px)'
-  const body = document.querySelector('body') as HTMLBodyElement
-  const devPanelEL = document.createElement('div')
-  devPanelEL.id = 'dev-panel'
-  body.insertAdjacentElement('afterbegin', devPanelEL)
-
-  // }
+  if (process.env.NODE_ENV !== 'production') {
+    const app = document.querySelector('#app') as HTMLElement
+    app.style.height = 'calc(100vh - 55px)'
+    const body = document.querySelector('body') as HTMLBodyElement
+    const devPanelEL = document.createElement('div')
+    devPanelEL.id = 'dev-panel'
+    body.insertAdjacentElement('afterbegin', devPanelEL)
+  }
 
   let page: Component
   function renderPage(href: string) {
