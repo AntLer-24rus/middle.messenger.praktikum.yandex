@@ -164,9 +164,9 @@ export abstract class Component<DataType = any> implements ComponentInterface {
       ...this.data,
       emit: this.emit.bind(this),
     }
-    method.call(eventThis, ...args)
+    const updatedData = method.call(eventThis, ...args)
     delete eventThis.emit
-    Object.assign(this.data, eventThis)
+    Object.assign(this.data, updatedData)
     if (this.needUpdate) this.emit(BASE_COMPONENT_EVENTS.RENDER)
   }
 
