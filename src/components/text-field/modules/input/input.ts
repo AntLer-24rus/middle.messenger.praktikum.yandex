@@ -4,6 +4,7 @@ import { defineHBSComponent } from '../../../../utils'
 export default defineHBSComponent({
   name: 'Input',
   renderer,
+  props: { disabled: true },
   nativeEvents: {
     blur(e: Event) {
       this.emit('Input:blur', e)

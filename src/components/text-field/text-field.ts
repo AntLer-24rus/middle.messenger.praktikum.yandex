@@ -7,6 +7,7 @@ import Label from './modules/label'
 type TextFieldProps = {
   validate: (val: string) => string
   value: string
+  disabled: boolean
   inputName: string
   placeholder: string
   error: string
@@ -22,6 +23,7 @@ export default defineHBSComponent<TextFieldData, TextFieldProps>({
   props: {
     validate: (val: string) => '',
     value: '',
+    disabled: true,
     inputName: 'text-filed',
     placeholder: 'введите текст',
     error: '',
