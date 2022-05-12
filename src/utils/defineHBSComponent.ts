@@ -224,18 +224,20 @@ export function defineHBSComponent<DataType = any, PropsType = any>(
       const template = renderer({ ...context }, this._hbsRuntimeOptions)
       fragment.innerHTML = template
 
-      for (const child of this.children) {
+      let idx = 0
+      let child = this.children[idx]
+      while (child) {
         const stub = fragment.content.querySelector(
           `[data-${DATA_SET_ID}="${child.id}"]`
         )
         if (!stub) {
-          throw new Error(
-            `Не найден stub с id ${child.id} в компоненте ${this.name}`
-          )
+          this.children.splice(idx, 1)
+        } else {
+          stub.replaceWith(child.getContent())
+          idx++
         }
-        stub.replaceWith(child.getContent())
+        child = this.children[idx]
       }
-
       return fragment.content
     }
   }
