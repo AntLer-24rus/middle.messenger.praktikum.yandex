@@ -8,13 +8,7 @@ export interface ComponentOptions<DataType = any, PropsType = any> {
   props?: PropsType
   data?: () => DataType
   listeners?: { eventName: string; callback: (...args: any[]) => void }[]
-  events?: Record<
-    string,
-    (
-      this: DataType & PropsType & { emit: Component<DataType>['emit'] },
-      e: Event
-    ) => void
-  >
+  events?: Record<string, (this: Component<DataType>, e: Event) => void>
 }
 
 type ComponentMeta = {
@@ -42,7 +36,7 @@ export abstract class Component<DataType = any> implements ComponentInterface {
   // [key: string | symbol]: any
   private _meta: ComponentMeta
   private _element: Element | null = null
-  protected data: DataType
+  public data: DataType
   private _events: Record<string, (e: Event) => void> = {}
   private _eventBus: EventBus = new EventBus()
   private _parent: Component | undefined = undefined
@@ -52,7 +46,7 @@ export abstract class Component<DataType = any> implements ComponentInterface {
     eventName: string
     callback: (e: Event) => void
   }[] = []
-  protected needUpdate: boolean = false
+  public needUpdate: boolean = false
 
   constructor({
     name,
@@ -76,7 +70,8 @@ export abstract class Component<DataType = any> implements ComponentInterface {
             if (updated) {
               this.needUpdate = true
               target[prop] = value
-              return true
+            }
+            if (typeof target[prop] === 'function') {
             }
             return true
           }
@@ -160,13 +155,7 @@ export abstract class Component<DataType = any> implements ComponentInterface {
     method: (...args: any[]) => void,
     ...args: any[]
   ): void {
-    const eventThis: DataType & { emit?: any } = {
-      ...this.data,
-      emit: this.emit.bind(this),
-    }
-    const updatedData = method.call(eventThis, ...args)
-    delete eventThis.emit
-    Object.assign(this.data, updatedData)
+    method.call(this, ...args)
     if (this.needUpdate) this.emit(BASE_COMPONENT_EVENTS.RENDER)
   }
 
