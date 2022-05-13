@@ -1,0 +1,51 @@
+<div class='{{classes.message}} {{typeClass}} {{className}}'>
+  <div class='{{classes.message__text}}'>
+    {{text}}
+
+  </div>
+  <div class='{{classes.message__time}}'>{{formattedDate}}</div>
+  {{#if isSend}}
+    <div class='{{classes.message__status}}'>
+      <svg
+        width='26'
+        height='14'
+        viewBox='0 0 26 14'
+        fill='none'
+        xmlns='http://www.w3.org/2000/svg'
+      >
+        <line
+          y1='-1.5'
+          x2='8.88934'
+          y2='-1.5'
+          transform='matrix(0.707106 0.707108 -0.707106 0.707108 0 7.71423)'
+          stroke='#337ECC'
+          stroke-width='3'
+        ></line>
+        <line
+          y1='-1.5'
+          x2='6.66701'
+          y2='-1.5'
+          transform='matrix(0.707108 0.707106 -0.707108 0.707106 9.42847 9.28577)'
+          stroke='#337ECC'
+          stroke-width='3'
+        ></line>
+        <line
+          x1='5.22498'
+          y1='12.9393'
+          x2='16.225'
+          y2='1.93934'
+          stroke='#337ECC'
+          stroke-width='3'
+        ></line>
+        <line
+          x1='13.0824'
+          y1='12.9393'
+          x2='24.0824'
+          y2='1.93934'
+          stroke='#337ECC'
+          stroke-width='3'
+        ></line>
+      </svg>
+    </div>
+  {{/if}}
+</div>

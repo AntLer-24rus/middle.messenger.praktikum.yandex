@@ -1,10 +1,19 @@
-<div class='{{classes.dev-panel}}'>
-  <div class='{{classes.dev-panel__title}}'>Панель навигации (отображается
-    только в режиме разработки)</div>
+<div class="{{classes.dev-panel}}">
+  <div class="{{classes.dev-panel__title}}">
+    Панель навигации (отображается только в режиме разработки)
+  </div>
   <ul>
-    <li><a href='/' onclick='linkHandler(event)'>home</a></li>
+    <li>
+      <a href="/" $click="navigate">
+        home
+      </a>
+    </li>
     {{#each pages}}
-      <li><a href='/{{this}}' onclick='linkHandler(event)'>{{this}}</a></li>
+      <li>
+        <a href="{{this.href}}" $click="navigate">
+          {{this.text}}
+        </a>
+      </li>
     {{/each}}
   </ul>
 </div>

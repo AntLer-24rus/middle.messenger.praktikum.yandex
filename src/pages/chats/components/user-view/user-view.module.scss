@@ -1,0 +1,56 @@
+@import '../../../../utils/variables';
+
+.user-view {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  padding-right: 20px;
+
+  &:hover {
+    background-color: $color-primary-extra-light;
+  }
+
+  &__avatar {
+    width: 80px;
+    height: 80px;
+    font-size: $extra-large-text;
+    background: $color-gray;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+  }
+
+  &__info {
+    flex-grow: 1;
+  }
+
+  &__remove-icon {
+    svg {
+      &:hover {
+        stroke: $color-error;
+      }
+    }
+  }
+}
+
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+  justify-content: space-between;
+  align-items: center;
+
+  &__user-name {
+    width: 100%;
+    font-size: $medium-text;
+  }
+
+  &__user-status {
+    width: 100%;
+    font-size: $base-text;
+  }
+}

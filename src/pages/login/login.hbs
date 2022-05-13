@@ -1,17 +1,20 @@
-<div class='{{classes.login-page}}'>
-  <div class='card {{classes.login-page__card}}'>
-    <div class='card__title'>
-      Привет
-    </div>
-    <div class='card__body'>
+<div class="{{classes.login-page}}">
+  {{#>comp name="Card" title="Привет" className=classes.login-page__card}}
+    {{#>slot name="body"}}
       {{#each inputs}}
-        {{>text-field}}
+        {{>comp name="TextField" 
+          inputName=this.name
+          label=this.label
+          placeholder=this.placeholder
+          error=this.error
+          validate=this.validate
+        }}
       {{/each}}
-      <div class="card__body {{classes.buttons_wrapper}}">
-        {{#each buttons}}
-          {{>button}}
-        {{/each}}
-      </div>
-    </div>
-  </div>
+    {{/slot}}
+    {{#>slot name="actions"}}
+      {{#each buttons}}
+        {{>comp name="Button" text=this.text type=this.type $click=this.click}}
+      {{/each}}
+    {{/slot}}
+  {{/comp}}
 </div>

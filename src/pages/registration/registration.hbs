@@ -1,17 +1,20 @@
-<div class='{{classes.registration-page}}'>
-  <div class='card {{classes.registration-page__card}}'>
-    <div class='card__title'>
-      Расскажите о себе?
-    </div>
-    <div class='card__body {{classes.card_gaps}}'>
+<div class="{{classes.registration-page}}">
+  {{#>comp name="Card" title="Расскажите о себе?" className=classes.registration-page__card}}
+    {{#>slot name="body"}}
       {{#each inputs}}
-        {{>text-field}}
+        {{>comp name="TextField" 
+          inputName=this.name
+          label=this.label
+          placeholder=this.placeholder
+          error=this.error
+          validate=this.validate
+        }}
       {{/each}}
-      <div class="card__body {{classes.buttons_wrapper}}">
-        {{#each buttons}}
-          {{>button}}
-        {{/each}}
-      </div>
-    </div>
-  </div>
+    {{/slot}}
+    {{#>slot name="actions"}}
+      {{#each buttons}}
+        {{>comp name="Button" text=this.text type=this.type $click=this.click}}
+      {{/each}}
+    {{/slot}}
+  {{/comp}}
 </div>

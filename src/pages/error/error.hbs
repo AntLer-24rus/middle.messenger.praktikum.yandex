@@ -1,14 +1,13 @@
-<div class='{{classes.error-page}}'>
-  <div class='card {{classes.error-page__card}}'>
-    <div class='card__title {{classes.error-page__code}}'>{{code}}</div>
-    <div class='card__body'>
-      <p class='{{classes.error-page__message}}'>{{text}}</p>
+<div class="{{classes.error-page}}">
+  {{#>comp name="Card" className=classes.error-page__card}}
+    {{#>slot name="title"}}
+      <span class="{{classes.error-page__code}}">{{code}}</span>
+    {{/slot}}
+    {{#>slot name="body"}}
+      <p class="{{classes.error-page__message}}">{{textError}}</p>
       <div class="{{classes.error-page__button}}">
-        {{#with button}}
-          {{>button}}
-        {{/with}}
+        {{>comp name="Button" text=buttonText type=buttonType $click=btnClick}}
       </div>
-    </div>
-    
-  </div>
+    {{/slot}}
+  {{/comp}}
 </div>

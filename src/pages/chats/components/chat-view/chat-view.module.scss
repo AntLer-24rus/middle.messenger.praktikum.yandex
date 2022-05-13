@@ -1,0 +1,98 @@
+@import '../../../../utils/variables';
+@import '../../../../utils/mixins';
+
+.chat {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+
+  &__title {
+    flex-shrink: 0;
+    height: 45px;
+    background: $color-gray-extra-light;
+    border-radius: 7px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 57px;
+    padding-right: 10px;
+  }
+
+  &__messages-area {
+    @include scrollable;
+
+    flex-grow: 1;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__message-string {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: $color-gray-extra-light;
+    border-radius: 7px;
+    padding: 0 10px;
+
+    .input-message {
+      flex-grow: 1;
+      margin-left: 15px;
+      margin-right: 15px;
+
+      input {
+        border: none;
+      }
+    }
+  }
+}
+
+.message {
+  margin-bottom: 5px;
+  margin-top: 5px;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &_income {
+    align-self: flex-start;
+  }
+
+  &_send {
+    align-self: flex-end;
+  }
+}
+
+// .message_income {
+//   align-self: flex-start;
+//   margin-bottom: 5px;
+//   margin-top: 5px;
+
+//   &:first-child {
+//     margin-top: 0;
+//   }
+
+//   &:last-child {
+//     margin-bottom: 0;
+//   }
+// }
+
+// .message_send {
+//   align-self: flex-end;
+//   margin-bottom: 5px;
+//   margin-top: 5px;
+
+//   &:first-child {
+//     margin-top: 0;
+//   }
+
+//   &:last-child {
+//     margin-bottom: 0;
+//   }
+// }
