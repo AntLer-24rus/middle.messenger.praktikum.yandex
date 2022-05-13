@@ -1,0 +1,12 @@
+# Задаем форматирование для JS и CSS
+[*.{js,css,ts}]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+trim_trailing_whitespace = true
+insert_final_newline = true
+# Но не переформатируем минифицированные JS и CSS файлы.
+[*.min.*]
+indent_style = ignore
+trim_trailing_whitespace = false
+insert_final_newline = ignore
