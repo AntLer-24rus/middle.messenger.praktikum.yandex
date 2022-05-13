@@ -1,3 +1,4 @@
+/* eslint no-param-reassign: ["error", { "props": false }] */
 export function saveReplaceProperty(obj: any, replacer: any) {
   const origValue: any = {}
   for (const key in obj) {

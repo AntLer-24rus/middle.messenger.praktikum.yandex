@@ -23,22 +23,25 @@ type ProfileProps = {
   isHide: boolean
 }
 
-type HBSContext = {
+type HBSContext<P> = {
   data: {
     key?: string
-    root?: ProfileData & ProfileProps
+    root?: P & ProfileProps
   }
 }
 
 type ProfileData = {
   isEdit: boolean
   avatar: string
-  label: (ctx: HBSContext) => string
-  placeholder: (ctx: HBSContext) => string
-  createValidator: (ctx: HBSContext) => string
-  icon: (this: Component<ProfileData & ProfileProps>, ctx: HBSContext) => string
-  disableInput: (ctx: HBSContext) => string
-  inputClasses: (ctx: HBSContext) => string
+  label: (ctx: HBSContext<ProfileData>) => string
+  placeholder: (ctx: HBSContext<ProfileData>) => string
+  createValidator: (ctx: HBSContext<ProfileData>) => string
+  icon: (
+    this: Component<ProfileData & ProfileProps>,
+    ctx: HBSContext<ProfileData>
+  ) => string
+  disableInput: (ctx: HBSContext<ProfileData>) => string
+  inputClasses: (ctx: HBSContext<ProfileData>) => string
   editProfile: (this: Component<ProfileData & ProfileProps>) => void
   close: (this: Component<ProfileData & ProfileProps>) => void
 }
@@ -64,8 +67,7 @@ export default defineHBSComponent<ProfileData, ProfileProps>({
   name: 'Profile',
   renderer,
   props: {
-    //@ts-ignore
-    classes,
+    classes: classes as unknown as typeof classes.default,
     isCurrentUser: true,
     profile: {
       email: 'antler@inbox.ru',
@@ -114,15 +116,14 @@ export default defineHBSComponent<ProfileData, ProfileProps>({
       },
       editProfile() {
         const profileComp = this.getParentByName('Profile')!
-        const isEdit: boolean = profileComp.data.isEdit
-
-        let profile = profileComp.data.profile
+        const { isEdit } = profileComp.data
+        let { profile } = profileComp.data
 
         if (isEdit) {
           const card = profileComp.getChildrenByName('Card')!
           const textFields = card.children.filter((c) => c.name === 'TextField')
           const formData = collectFieldValues(textFields)
-          console.log('save', formData)
+          global.console.log('save', formData)
           if (!formData.valid) return
           profile = formData.data
         }
@@ -141,7 +142,6 @@ export default defineHBSComponent<ProfileData, ProfileProps>({
   },
   nativeEvents: {
     changeAvatar() {
-      console.log('this :>> ', this)
       if (this.data.isEdit) {
         this.data.error = 'Ошибка смены аватара'
       }

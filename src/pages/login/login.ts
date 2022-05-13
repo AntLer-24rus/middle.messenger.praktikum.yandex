@@ -43,7 +43,7 @@ export default defineHBSComponent({
           const card = loginPage.getChildrenByName('Card')!
           const textFields = card.children.filter((c) => c.name === 'TextField')
           const formData = collectFieldValues(textFields)
-          console.log('login data :>> ', formData)
+          global.console.log('login data :>> ', formData)
         },
       },
       {
@@ -52,7 +52,7 @@ export default defineHBSComponent({
         click(e: Event) {
           e.preventDefault()
           e.stopPropagation()
-          console.log('Нет аккаунта?')
+          global.console.log('Нет аккаунта?')
         },
       },
     ],

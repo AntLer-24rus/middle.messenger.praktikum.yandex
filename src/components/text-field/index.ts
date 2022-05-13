@@ -1,1 +1,1 @@
-export { default, TextFieldComp } from './text-field'
+export { default as TextField, TextFieldComp } from './text-field'

@@ -1,1 +1,1 @@
-export * from './dev-panel/dev-panel'
+export { DevPanel } from './dev-panel'

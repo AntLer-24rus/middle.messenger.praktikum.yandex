@@ -1,12 +1,13 @@
-import { registerHelper } from 'handlebars'
+/* eslint no-use-before-define: "off" */
+/* eslint no-param-reassign: ["error", { "props": false }] */
 import { v4 as uuid } from 'uuid'
-import { EventBus } from './index'
+import { EventBus } from './EventBus'
 
 export interface ComponentOptions<DataType = any, PropsType = any> {
   name: string
   parent?: Component
   props?: PropsType
-  data?: () => DataType
+  data?: (this: DataType & PropsType) => DataType
   listeners?: { eventName: string; callback: (...args: any[]) => void }[]
   events?: Record<
     string,
@@ -25,31 +26,44 @@ export interface ComponentInterface {
   id: string
 }
 
-export const enum BASE_COMPONENT_EVENTS {
-  RENDER = 'render',
-  MOUNTED = 'mounted',
-  UPDATE = 'update',
-  UPDATED = 'updated',
-  NATIVE_EVENT = 'native:event',
+function parseAttr(attr: Attr): [string, string] {
+  const eventName = attr.name.slice(Component.EVENT_PREFIX.length)
+  const callbackName = attr.value
+  return [eventName, callbackName]
 }
-
-const enum t {}
 export abstract class Component<DataType = any> implements ComponentInterface {
-  static EVENT_PREFIX: string = '$'
+  static EVENT_PREFIX = '$'
+
+  static EVENTS = {
+    RENDER: 'render',
+    MOUNTED: 'mounted',
+    UPDATE: 'update',
+    UPDATED: 'updated',
+    NATIVE_EVENT: 'native:event',
+  }
+
   // [key: string | symbol]: any
   private _meta: ComponentMeta
+
   private _element: Element | null = null
+
   public data: DataType
+
   private _events: Record<string, (e: Event) => void> = {}
+
   private _eventBus: EventBus = new EventBus()
+
   private _parent: Component | undefined = undefined
+
   private _children: Component[] = []
+
   private _nativeListeners: {
     el: Element
     eventName: string
     callback: (e: Event) => void
   }[] = []
-  public needUpdate: boolean = false
+
+  public needUpdate = false
 
   constructor({
     name,
@@ -74,8 +88,6 @@ export abstract class Component<DataType = any> implements ComponentInterface {
               this.needUpdate = true
               target[prop] = value
             }
-            if (typeof target[prop] === 'function') {
-            }
             return true
           }
           return false
@@ -90,11 +102,13 @@ export abstract class Component<DataType = any> implements ComponentInterface {
   public get children() {
     return this._children
   }
+
   public get parent() {
     return this._parent
   }
 
   protected abstract render(context: any): DocumentFragment
+
   private _render() {
     // console.log(`Render ${this.name}.${this.id}`)
     const fragment = this.render({ ...this.data })
@@ -116,36 +130,38 @@ export abstract class Component<DataType = any> implements ComponentInterface {
 
   private _update(data: any) {
     Object.assign(this.data, data)
-    if (this.needUpdate) this._eventBus.emit(BASE_COMPONENT_EVENTS.RENDER)
+    if (this.needUpdate) this._eventBus.emit(Component.EVENTS.RENDER)
   }
 
   public emit(eventName: string, ...args: any) {
     this._eventBus.emit(eventName, ...args)
   }
+
   private _registerEvents(
     listeners: { eventName: string; callback: () => void }[] = []
   ) {
-    this._eventBus.on(BASE_COMPONENT_EVENTS.RENDER, this._render.bind(this))
-    this._eventBus.on(BASE_COMPONENT_EVENTS.MOUNTED, () => {})
+    this._eventBus.on(Component.EVENTS.RENDER, this._render.bind(this))
     this._eventBus.on(
-      BASE_COMPONENT_EVENTS.NATIVE_EVENT,
+      Component.EVENTS.NATIVE_EVENT,
       this._callNativeEvent.bind(this)
     )
-    this._eventBus.on(BASE_COMPONENT_EVENTS.UPDATE, this._update.bind(this))
+    this._eventBus.on(Component.EVENTS.UPDATE, this._update.bind(this))
     for (const listener of listeners) {
       this._eventBus.on(listener.eventName, listener.callback.bind(this))
     }
   }
+
   private _addNativeEventListener(
     el: Element,
     eventName: string,
     callbackName: string
   ) {
     const callback = (event: Event) =>
-      this.emit(BASE_COMPONENT_EVENTS.NATIVE_EVENT, callbackName, event)
+      this.emit(Component.EVENTS.NATIVE_EVENT, callbackName, event)
     el.addEventListener(eventName, callback)
     this._nativeListeners.push({ el, eventName, callback })
   }
+
   private _callNativeEvent(methodName: string, e: Event) {
     const method = this._events[methodName]
     if (method && typeof method === 'function') {
@@ -154,24 +170,20 @@ export abstract class Component<DataType = any> implements ComponentInterface {
       this._eventBus.emit(methodName, e)
     }
   }
+
   protected callEventInContext(
     method: (...args: any[]) => void,
     ...args: any[]
   ): void {
     method.call(this, ...args)
-    if (this.needUpdate) this.emit(BASE_COMPONENT_EVENTS.RENDER)
+    if (this.needUpdate) this.emit(Component.EVENTS.RENDER)
   }
 
-  private _parseAttr(attr: Attr): [string, string] {
-    const eventName = attr.name.slice(Component.EVENT_PREFIX.length)
-    const callbackName = attr.value
-    return [eventName, callbackName]
-  }
   private _addEvents(element: Element = this.element) {
     let removeAttr = []
     for (const attr of element.attributes) {
       if (attr.name.startsWith(Component.EVENT_PREFIX)) {
-        this._addNativeEventListener(element, ...this._parseAttr(attr))
+        this._addNativeEventListener(element, ...parseAttr(attr))
         removeAttr.push(attr)
       }
     }
@@ -182,7 +194,7 @@ export abstract class Component<DataType = any> implements ComponentInterface {
       removeAttr = []
       for (const attr of child.attributes) {
         if (attr.name.startsWith(Component.EVENT_PREFIX)) {
-          this._addNativeEventListener(child, ...this._parseAttr(attr))
+          this._addNativeEventListener(child, ...parseAttr(attr))
           removeAttr.push(attr)
         }
       }
@@ -191,11 +203,8 @@ export abstract class Component<DataType = any> implements ComponentInterface {
       })
       this._addEvents(child)
     }
-
-    // Object.keys(this._events).forEach((eventName) => {
-    //   this._element!.addEventListener(eventName, this._events[eventName])
-    // })
   }
+
   private _removeEvents() {
     let listener = this._nativeListeners.pop()
     while (listener) {
@@ -219,34 +228,41 @@ export abstract class Component<DataType = any> implements ComponentInterface {
   public show() {
     this.element.style.display = ''
   }
+
   public hide() {
     this.element.style.display = 'none'
   }
+
   public getContent() {
     const content = this._element
     if (!content)
       throw new Error('Запрос на получение компонента до инициализации')
     return content
   }
+
   public get name() {
     return this._meta.name
   }
+
   public get id() {
     return this._meta.id
   }
 
   public getParentByName(name: string): Component | null {
     if (this.name === name) return this
-    const parent = this.parent
+    const { parent } = this
     if (!parent) return null
     return parent.getParentByName(name)
   }
+
   public getChildrenByName(name: string): Component | undefined {
     return this.children.find((c) => c.name === name)
   }
+
   public setProps(data: any) {
-    this._eventBus.emit(BASE_COMPONENT_EVENTS.UPDATE, data)
+    this._eventBus.emit(Component.EVENTS.UPDATE, data)
   }
+
   public mount(selector: string) {
     if (this._parent)
       throw new Error(

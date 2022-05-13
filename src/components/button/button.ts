@@ -2,16 +2,23 @@ import renderer from './button.hbs'
 import * as classes from './style.module.scss'
 import { defineHBSComponent } from '../../utils'
 
-export default defineHBSComponent({
+type ButtonData = {
+  isStroke: boolean
+}
+type ButtonProps = {
+  classes: typeof classes.default
+  type: 'stroke' | 'filled'
+}
+
+export default defineHBSComponent<ButtonData, ButtonProps>({
   name: 'Button',
   props: {
-    type: 'stoke',
+    classes: classes as unknown as typeof classes.default,
+    type: 'stroke',
   },
   renderer,
   data() {
     return {
-      classes,
-      //@ts-ignore
       isStroke: this.type === 'stroke',
     }
   },

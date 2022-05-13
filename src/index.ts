@@ -1,8 +1,6 @@
-import DevPanel from './modules/dev-panel'
-
-import ErrorPage from './pages/error'
+import { DevPanel } from './modules'
+import { ErrorPage, pages } from './pages'
 import type { Component } from './utils'
-import { pages } from './pages'
 
 document.addEventListener('DOMContentLoaded', () => {
   if (process.env.NODE_ENV !== 'production') {

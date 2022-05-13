@@ -77,7 +77,7 @@ export default defineHBSComponent({
           const card = registrationPage.getChildrenByName('Card')!
           const textFields = card.children.filter((c) => c.name === 'TextField')
           const formData = collectFieldValues(textFields)
-          console.log('registration data :>> ', formData)
+          global.console.log('registration data :>> ', formData)
         },
       },
       {
@@ -87,7 +87,7 @@ export default defineHBSComponent({
           e.preventDefault()
           e.stopPropagation()
 
-          console.log('Уже есть аккаунт?')
+          global.console.log('Уже есть аккаунт?')
         },
       },
     ],

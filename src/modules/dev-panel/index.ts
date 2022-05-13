@@ -1,1 +1,1 @@
-export { default } from './dev-panel'
+export { default as DevPanel } from './dev-panel'

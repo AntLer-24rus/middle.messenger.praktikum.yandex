@@ -1,7 +1,7 @@
 import renderer from './chats-list.hbs'
 import * as classes from './chats-list.module.scss'
 import { defineHBSComponent } from '../../../../utils'
-import ChatPreview from '../chat-preview'
+import { ChatPreview } from '../chat-preview'
 
 type ChatListProps = {
   classes: typeof classes

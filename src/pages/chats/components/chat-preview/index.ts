@@ -1,1 +1,1 @@
-export { default } from './chat-preview'
+export { default as ChatPreview } from './chat-preview'

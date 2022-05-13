@@ -1,9 +1,9 @@
-import LoginPage from './login/login'
-import RegistrationPage from './registration/registration'
-import ChatsPage from './chats/chats'
-import ErrorPage from './error/error'
-// import profilePage from './profile/profile'
+import { LoginPage } from './login'
+import { RegistrationPage } from './registration'
+import { ChatsPage } from './chats'
+import { ErrorPage } from './error'
 
+export { ErrorPage } from './error'
 export const pages = [
   { href: '/login', text: 'login', Comp: LoginPage },
   { href: '/registration', text: 'registration', Comp: RegistrationPage },

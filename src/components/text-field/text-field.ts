@@ -1,8 +1,8 @@
 import renderer from './text-field.hbs'
 import * as classes from './text-field.module.scss'
-import { defineHBSComponent, last, Component } from '../../utils'
-import Input from './modules/input'
-import Label from './modules/label'
+import { defineHBSComponent, Component } from '../../utils'
+import { Input } from './modules/input'
+import { Label } from './modules/label'
 
 type TextFieldProps = {
   validate: (val: string) => string
@@ -12,10 +12,14 @@ type TextFieldProps = {
   placeholder: string
   error: string
 }
+
 type TextFieldData = {
   classes: typeof classes
   type: string
-  validateInput: (this: TextFieldComp, value?: string) => string
+  validateInput: (
+    this: Component<TextFieldData & TextFieldProps>,
+    value?: string
+  ) => string
 }
 
 export type TextFieldComp = Component<TextFieldData & TextFieldProps>
@@ -55,7 +59,4 @@ export default defineHBSComponent<TextFieldData, TextFieldProps>({
     }
   },
   components: [Input, Label],
-  nativeEvents: {
-    blur(e: Event) {},
-  },
 })

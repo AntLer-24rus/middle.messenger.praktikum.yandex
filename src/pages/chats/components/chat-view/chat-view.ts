@@ -1,7 +1,7 @@
 import renderer from './chat-view.hbs'
 import * as classes from './chat-view.module.scss'
 import { Component, defineHBSComponent } from '../../../../utils'
-import Message from '../message'
+import { Message } from '../message'
 import { Icon, TextField, Overlay, Card } from '../../../../components'
 
 type ChatViewProps = {

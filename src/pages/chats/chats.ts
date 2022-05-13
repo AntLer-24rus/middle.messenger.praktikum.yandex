@@ -1,17 +1,17 @@
 import renderer from './chats.hbs'
 import * as classes from './chats.module.scss'
 import { Component, defineHBSComponent } from '../../utils'
-import ChatList from './components/chats-list'
-import ChatView from './components/chat-view'
+import { ChatsList } from './components/chats-list'
+import { ChatView } from './components/chat-view'
 import { TextField, Icon } from '../../components'
-import UserList from './components/user-list'
-import Profile from './components/profile'
+import { UserList } from './components/user-list'
+import { Profile } from './components/profile'
 
 export default defineHBSComponent({
   name: 'Chats',
   renderer,
   props: { classes },
-  components: [TextField, Icon, ChatList, ChatView, UserList, Profile],
+  components: [TextField, Icon, ChatsList, ChatView, UserList, Profile],
   data: () => ({
     chats: [
       {

@@ -3,11 +3,6 @@ import * as classes from './style.module.scss'
 import { Button, Card } from '../../components'
 import { defineHBSComponent } from '../../utils'
 
-const buttonData = {
-  text: 'Назад к чатам',
-  type: 'stroke',
-}
-
 export default defineHBSComponent({
   name: 'Error',
   components: [Card, Button],
@@ -16,8 +11,8 @@ export default defineHBSComponent({
   data: () => ({
     buttonText: 'Назад к чатам',
     buttonType: 'stroke',
-    btnClick(e: Event) {
-      console.log('Назад к чатам')
+    btnClick() {
+      global.console.log('Назад к чатам')
     },
   }),
 })

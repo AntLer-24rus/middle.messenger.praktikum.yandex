@@ -30,7 +30,7 @@ export class EventBus {
       return
     }
 
-    this._listeners[event].forEach(function (listener) {
+    this._listeners[event].forEach((listener) => {
       listener(...args)
     })
   }

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow
 enum METHODS {
   GET = 'GET',
   POST = 'POST',
@@ -26,7 +27,12 @@ type HTTPTransportMethodSignature = (
 ) => Promise<HTTPTransportResponse>
 
 export class HTTPTransport {
-  constructor(private _baseUrl: string = window.location.origin) {}
+  private _baseUrl: string
+
+  constructor(baseUrl: string = window.location.origin) {
+    this._baseUrl = baseUrl
+  }
+
   get: HTTPTransportMethodSignature = (pathname = '', options = {}) => {
     if (pathname && !/^\/[^?]*$/gm.test(pathname))
       throw new Error('Неправильно использован параметр pathname')
@@ -35,21 +41,25 @@ export class HTTPTransport {
       method: METHODS.GET,
     })
   }
+
   put: HTTPTransportMethodSignature = (pathname = '', options = {}) => {
     if (pathname && !/^\/[^?]*$/gm.test(pathname))
       throw new Error('Неправильно использован параметр pathname')
     return this.request(pathname, { ...options, method: METHODS.PUT })
   }
+
   patch: HTTPTransportMethodSignature = (pathname = '', options = {}) => {
     if (pathname && !/^\/[^?]*$/gm.test(pathname))
       throw new Error('Неправильно использован параметр pathname')
     return this.request(pathname, { ...options, method: METHODS.PATCH })
   }
+
   post: HTTPTransportMethodSignature = (pathname = '', options = {}) => {
     if (pathname && !/^\/[^?]*$/gm.test(pathname))
       throw new Error('Неправильно использован параметр pathname')
     return this.request(pathname, { ...options, method: METHODS.POST })
   }
+
   delete: HTTPTransportMethodSignature = (pathname = '', options = {}) => {
     if (pathname && !/^\/[^?]*$/gm.test(pathname))
       throw new Error('Неправильно использован параметр pathname')

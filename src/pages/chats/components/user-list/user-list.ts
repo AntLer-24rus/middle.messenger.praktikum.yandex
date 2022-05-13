@@ -1,6 +1,6 @@
 import { Card, Icon } from '../../../../components'
 import { Component, defineHBSComponent } from '../../../../utils'
-import UserView from '../user-view'
+import { UserView } from '../user-view'
 import renderer from './user-list.hbs'
 import * as classes from './user-list.module.scss'
 
@@ -53,10 +53,10 @@ export default defineHBSComponent<UserListData, UserListProps>({
         overlay.hide()
       },
       removeUser(user: any) {
-        console.log('Удалить юзера', user)
+        global.console.log('Удалить юзера', user)
       },
       removeChat() {
-        console.log('Удалить чат', this.id)
+        global.console.log('Удалить чат', this.id)
       },
     }
   },

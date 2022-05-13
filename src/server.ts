@@ -9,5 +9,5 @@ app.use(express.static(publicPath, { index: false }))
 app.use('*', (_, res: Response) => res.sendFile(join(publicPath, 'index.html')))
 
 app.listen(3000, () => {
-  console.log('Server listening port 3000...')
+  global.console.log('Server listening port 3000...')
 })

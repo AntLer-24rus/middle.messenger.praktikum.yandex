@@ -3,7 +3,7 @@ type Validator = {
   error: string
 }
 
-const name_validators: Validator[] = [
+const nameValidators: Validator[] = [
   {
     handler: (val) => !/^[A-ZА-Я]{1}[a-zA-Zа-яА-Я-]*$/gm.test(val),
     error: 'A-z, А-я, первая буква должна быть заглавной',
@@ -49,8 +49,8 @@ const validatorsGlobal: {
       error: 'Пароль должен содержать хотя бы цифру',
     },
   ],
-  first_name: name_validators,
-  second_name: name_validators,
+  first_name: nameValidators,
+  second_name: nameValidators,
   display_name: [
     {
       handler: (val) => !val,
