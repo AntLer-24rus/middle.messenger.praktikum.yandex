@@ -8,7 +8,10 @@ export interface ComponentOptions<DataType = any, PropsType = any> {
   props?: PropsType
   data?: () => DataType
   listeners?: { eventName: string; callback: (...args: any[]) => void }[]
-  events?: Record<string, (this: Component<DataType>, e: Event) => void>
+  events?: Record<
+    string,
+    (this: Component<DataType & PropsType>, e: Event) => void
+  >
 }
 
 type ComponentMeta = {
