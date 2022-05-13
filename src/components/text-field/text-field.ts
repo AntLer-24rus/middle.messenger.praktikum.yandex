@@ -28,7 +28,7 @@ export default defineHBSComponent<TextFieldData, TextFieldProps>({
   name: 'TextField',
   renderer,
   props: {
-    validate: (val: string) => '',
+    validate: () => '',
     value: '',
     disabled: false,
     inputName: 'text-filed',

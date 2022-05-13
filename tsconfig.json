@@ -7,8 +7,8 @@
     "strict": true,
     "skipLibCheck": true,
     "noImplicitAny": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "sourceMap": true,
     "strictNullChecks": true,
     "plugins": [{ "name": "typescript-plugin-css-modules" }]
