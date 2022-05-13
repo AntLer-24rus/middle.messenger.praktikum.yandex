@@ -15,7 +15,10 @@ type TextFieldProps = {
 type TextFieldData = {
   classes: typeof classes
   type: string
+  validateInput: (this: TextFieldComp, value?: string) => string
 }
+
+export type TextFieldComp = Component<TextFieldData & TextFieldProps>
 
 export default defineHBSComponent<TextFieldData, TextFieldProps>({
   name: 'TextField',
@@ -23,7 +26,7 @@ export default defineHBSComponent<TextFieldData, TextFieldProps>({
   props: {
     validate: (val: string) => '',
     value: '',
-    disabled: true,
+    disabled: false,
     inputName: 'text-filed',
     placeholder: 'введите текст',
     error: '',
@@ -32,13 +35,22 @@ export default defineHBSComponent<TextFieldData, TextFieldProps>({
     return {
       classes,
       type: this.inputName === 'password' ? 'password' : 'text',
-      validateInput(this: Component<TextFieldData & TextFieldProps>, e: Event) {
-        const input = e.target as HTMLInputElement
-        const error = this.data.validate(input.value)
-        const errorLabel = this.parent!.children.find(
-          (c) => c.element === input.nextElementSibling
-        )
-        errorLabel!.setProps({ text: error })
+      validateInput(inputValue) {
+        const value = inputValue ?? this.data.value
+        const error = this.data.validate(value)
+
+        const textField = this.getParentByName('TextField')!
+        const errorLabel = textField.children.find(
+          (c) => c.name === 'Label' && c.data.className.includes('error')
+        )!
+        const input = textField.getChildrenByName('Input')!
+
+        textField.data.error = error
+        textField.data.value = value
+        textField.needUpdate = false
+        errorLabel.setProps({ text: error })
+        input.setProps({ value })
+        return error
       },
     }
   },

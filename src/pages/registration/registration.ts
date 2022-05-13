@@ -1,7 +1,12 @@
 import renderer from './registration.hbs'
 import * as classes from './style.module.scss'
 
-import { defineHBSComponent, validator } from '../../utils'
+import {
+  collectFieldValues,
+  Component,
+  defineHBSComponent,
+  validator,
+} from '../../utils'
 import { Button, TextField, Card } from '../../components'
 
 export default defineHBSComponent({
@@ -65,46 +70,26 @@ export default defineHBSComponent({
       {
         text: 'Зарегистрироваться',
         type: 'filled',
-        click: () => {},
+        click(this: Component, e: Event) {
+          e.preventDefault()
+          e.stopPropagation()
+          const registrationPage = this.getParentByName('RegistrationPage')!
+          const card = registrationPage.getChildrenByName('Card')!
+          const textFields = card.children.filter((c) => c.name === 'TextField')
+          const formData = collectFieldValues(textFields)
+          console.log('registration data :>> ', formData)
+        },
       },
       {
         text: 'Уже есть аккаунт?',
         type: 'stroke',
-        click: (e: Event) => {
+        click(e: Event) {
           e.preventDefault()
+          e.stopPropagation()
+
           console.log('Уже есть аккаунт?')
         },
       },
     ],
   }),
-  nativeEvents: {
-    signin(e: Event) {
-      e.preventDefault()
-      const form = e.target as HTMLFormElement
-      const data: Record<string, string> = {}
-      const localInputs = []
-      for (const el of form.elements) {
-        if (el instanceof HTMLInputElement) {
-          data[el.name] = el.value
-          let error
-          if (el.name === 'confirm_password')
-            error = validator('password', el.value)
-          else error = validator(el.name, el.value)
-          const input = this.inputs.find((i) => i.name === el.name)
-          localInputs.push({ ...input!, error })
-        }
-      }
-      this.inputs = localInputs
-      const formData = {
-        data,
-        valid: this.inputs.every((i) => !i.error),
-        errors: Object.fromEntries(this.inputs.map((i) => [i.name, i.error])),
-      }
-      if (formData.data.password !== formData.data.confirm_password) {
-        formData.valid = false
-        formData.errors['confirm_password'] = 'Пароли не совпадают!'
-      }
-      console.log('form :>> ', formData)
-    },
-  },
 })

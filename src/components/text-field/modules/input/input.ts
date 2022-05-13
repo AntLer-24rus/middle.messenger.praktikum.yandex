@@ -7,10 +7,14 @@ export default defineHBSComponent({
   props: { disabled: true },
   nativeEvents: {
     blur(e: Event) {
-      this.emit('Input:blur', e)
+      e.stopPropagation()
+      const { value } = e.target as HTMLInputElement
+      this.emit('Input:blur', value)
     },
     focus(e: Event) {
-      this.emit('Input:focus', e)
+      e.stopPropagation()
+      const { value } = e.target as HTMLInputElement
+      this.emit('Input:focus', value)
     },
   },
 })

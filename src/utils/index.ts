@@ -12,3 +12,4 @@ export {
 export { defineHBSComponent } from './defineHBSComponent'
 export { EventBus } from './EventBus'
 export { validator } from './validator'
+export { collectFieldValues } from './collectFieldValues'

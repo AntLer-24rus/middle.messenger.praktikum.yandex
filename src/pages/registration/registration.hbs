@@ -1,24 +1,20 @@
 <div class="{{classes.registration-page}}">
-  <form $submit="signin">
-    {{#>comp name="Card" title="Расскажите о себе?" className=classes.registration-page__card}}
-      {{#>slot name="body"}}
-        {{#each inputs}}
-          {{>comp name="TextField" 
-            inputName=this.name
-            label=this.label
-            placeholder=this.placeholder
-            error=this.error
-            validate=this.validate
-          }}
-        {{/each}}
-      {{/slot}}
-      {{#>slot name="actions"}}
-        {{#each buttons}}
-          {{>comp name="Button" text=this.text type=this.type $click=this.click}}
-        {{/each}}
-      {{/slot}}
-    {{/comp}}
-  </form>
-
-
+  {{#>comp name="Card" title="Расскажите о себе?" className=classes.registration-page__card}}
+    {{#>slot name="body"}}
+      {{#each inputs}}
+        {{>comp name="TextField" 
+          inputName=this.name
+          label=this.label
+          placeholder=this.placeholder
+          error=this.error
+          validate=this.validate
+        }}
+      {{/each}}
+    {{/slot}}
+    {{#>slot name="actions"}}
+      {{#each buttons}}
+        {{>comp name="Button" text=this.text type=this.type $click=this.click}}
+      {{/each}}
+    {{/slot}}
+  {{/comp}}
 </div>
