@@ -1,5 +1,5 @@
 import renderer from './error.hbs'
-import * as classes from './style.module.scss'
+import * as classes from './error.module.scss'
 import { Button, Card } from '../../components'
 import { defineHBSComponent } from '../../utils'
 

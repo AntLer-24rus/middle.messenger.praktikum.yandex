@@ -4,11 +4,31 @@ import { Component, defineHBSComponent } from '../../../../utils'
 import { Message } from '../message'
 import { Icon, TextField, Overlay, Card } from '../../../../components'
 
+type Message = {
+  isSend: boolean
+  type: 'income' | 'send'
+  text: string
+  date: Date
+}
+
 type ChatViewProps = {
   classes: typeof classes
   className: string
+  message?: Message
 }
-type ChatViewData = unknown
+type HBSContext<P> = {
+  data: {
+    key?: string
+    root?: P & ChatViewProps
+  }
+}
+type ChatViewData = {
+  messageClass: (this: Message, ctx: HBSContext<ChatViewData>) => string
+  showChatInfo: (
+    this: Component<ChatViewData & ChatViewProps>,
+    e: Event
+  ) => void
+}
 
 export default defineHBSComponent<ChatViewData, ChatViewProps>({
   name: 'ChatView',
@@ -19,6 +39,13 @@ export default defineHBSComponent<ChatViewData, ChatViewProps>({
     return {
       showChatInfo(this: Component, e: Event) {
         this.parent!.emit('ChatView:showChatInfo', e)
+      },
+      messageClass() {
+        const cls = classes as unknown as typeof classes.default
+        const messageClasses = [cls.message]
+        if (this.isSend) messageClasses.push(cls.message_send)
+        else messageClasses.push(cls.message_income)
+        return messageClasses.join(' ')
       },
     }
   },

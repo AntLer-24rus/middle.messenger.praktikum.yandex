@@ -1,4 +1,4 @@
-@import '../../../../utils/variables.scss';
+@import '../../../../utils/variables';
 
 .message {
   max-width: 400px;
@@ -28,11 +28,12 @@
   &_send {
     background-color: $color-primary-light;
     margin-right: 20px;
+
     &::after {
       content: '';
       background-color: transparent;
       position: absolute;
-      bottom: 0px;
+      bottom: 0;
       right: -30px;
       width: 30px;
       height: 10px;
@@ -40,14 +41,16 @@
       box-shadow: -20px 0 $color-primary-light;
     }
   }
+
   &_income {
     background-color: $color-gray;
     margin-left: 20px;
+
     &::after {
       content: '';
       background-color: transparent;
       position: absolute;
-      bottom: 0px;
+      bottom: 0;
       left: -30px;
       width: 30px;
       height: 10px;

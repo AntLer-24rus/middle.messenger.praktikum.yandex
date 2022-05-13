@@ -1,8 +1,9 @@
+@use 'sass:color';
+
 @mixin scrollable() {
   overflow-y: auto;
   scrollbar-gutter: stable;
   margin-right: 3px;
-
   scrollbar-color: darkgray transparent;
 
   &::-webkit-scrollbar {
@@ -16,8 +17,9 @@
   &::-webkit-scrollbar-thumb {
     background-color: darkgray;
     border-radius: 20px;
+
     &:hover {
-      background-color: darken($color: darkgray, $amount: 15);
+      background-color: color.adjust(darkgray, $lightness: -15%);
     }
   }
 }

@@ -8,7 +8,7 @@
     "build": "npm run check && cross-env NODE_ENV=development parcel build src/index.html",
     "clean": "rimraf dist .parcel-cache",
     "check": "tsc --noEmit",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src/**/*.ts && stylelint '**/*.scss'"
   },
   "repository": {
     "type": "git",
@@ -38,6 +38,9 @@
     "parcel-transformer-hbs": "^1.0.4",
     "prettier": "^2.6.2",
     "rimraf": "^3.0.2",
+    "stylelint": "^14.8.2",
+    "stylelint-config-prettier-scss": "^0.0.1",
+    "stylelint-config-standard-scss": "^3.0.0",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3",
     "typescript-plugin-css-modules": "^3.4.0"

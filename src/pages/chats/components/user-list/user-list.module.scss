@@ -1,5 +1,6 @@
-@import '../../../../utils/mixins.scss';
-@import '../../../../utils/variables.scss';
+@use 'sass:color';
+@import '../../../../utils/mixins';
+@import '../../../../utils/variables';
 
 .user-list {
   padding: 30px;
@@ -13,6 +14,7 @@
 
   &__search {
     width: 100%;
+
     input {
       background-color: $color-gray-light;
       border-color: $color-gray-light;
@@ -21,6 +23,7 @@
 
   &__list {
     @include scrollable;
+
     width: 100%;
     height: 300px;
     display: flex;
@@ -32,6 +35,6 @@
     margin-top: 30px;
     color: $color-error;
     border: 1px solid $color-error;
-    background-color: lighten($color: $color-error, $amount: 27);
+    background-color: color.adjust($color-error, $lightness: 27%);
   }
 }

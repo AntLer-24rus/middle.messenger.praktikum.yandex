@@ -1,11 +1,11 @@
-@import '../../utils/variables.scss';
+@import '../../utils/variables';
 
 .text-field {
   font-size: $extra-slam-text;
+
   &__label {
     height: 11px;
     display: block;
-
     padding-left: 7px;
     padding-bottom: 1px;
   }
@@ -17,6 +17,7 @@
     &::placeholder {
       color: $color-placeholder-text;
     }
+
     font-size: $base-text;
     width: 100%;
     border: 1px solid $color-border;
@@ -27,7 +28,6 @@
   &__error {
     display: block;
     height: 11px;
-
     color: $color-error;
     padding: 1px 0;
   }

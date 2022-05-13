@@ -5,21 +5,12 @@
   </div>
   <div class='{{classes.chat__messages-area}}'>
     {{#each messages as | message |}}
-      {{#if message.isSend}}
-        {{>comp name="Message"
-            isSend=message.isSend 
-            text=message.text
-            date=message.date
-            className=@root.classes.message_send
-        }}
-      {{else}}
-        {{>comp name="Message"
-            isSend=message.isSend
-            text=message.text
-            date=message.date
-            className=@root.classes.message_income
-        }}
-      {{/if}}
+      {{>comp name="Message"
+          isSend=message.isSend 
+          text=message.text
+          date=message.date
+          className=(@root.messageClass)
+      }}
     {{/each}}
   </div>
   <div class='{{classes.chat__message-string}} {{classes.panel}}'>

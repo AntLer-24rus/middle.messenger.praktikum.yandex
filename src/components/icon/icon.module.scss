@@ -1,10 +1,12 @@
-@import '../../utils/variables.scss';
+@use 'sass:color';
+@import '../../utils/variables';
 
 .icon {
   svg {
     stroke: $color-gray;
+
     &:hover {
-      stroke: darken($color: $color-gray, $amount: 20);
+      stroke: color.adjust($color-gray, $lightness: -20%);
     }
   }
 }

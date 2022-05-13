@@ -1,5 +1,5 @@
 import renderer from './registration.hbs'
-import * as classes from './style.module.scss'
+import * as classes from './registration.module.scss'
 
 import {
   collectFieldValues,
