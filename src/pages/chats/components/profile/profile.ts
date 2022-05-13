@@ -1,5 +1,5 @@
 import { Icon, TextField } from '../../../../components'
-import { Component, defineHBSComponent } from '../../../../utils'
+import { Component, defineHBSComponent, validator } from '../../../../utils'
 import renderer from './profile.hbs'
 import * as classes from './profile.module.scss'
 
@@ -69,6 +69,9 @@ export default defineHBSComponent<ProfileData, ProfileProps>({
       placeholder({ data: { key } }: any) {
         //@ts-ignore
         return fieldPlaceholder[key]
+      },
+      createValidator({ data: { key } }: any) {
+        return validator.bind(null, key)
       },
       icon({ data: { root } }: any) {
         return root.isEdit ? 'done' : 'edit'
