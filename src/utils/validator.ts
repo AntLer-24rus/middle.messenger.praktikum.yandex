@@ -51,6 +51,12 @@ const validatorsGlobal: {
   ],
   first_name: name_validators,
   second_name: name_validators,
+  display_name: [
+    {
+      handler: (val) => !val,
+      error: 'Не должно быть пустым',
+    },
+  ],
   email: [
     {
       handler: (val) => !/^[0-9A-z]+@[0-9A-z]+\..+$/gm.test(val),
