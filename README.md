@@ -47,3 +47,4 @@ npm run clean
 ## Pull requests
 
 Первый спринт [sprint_1](https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex/pull/1)
+Второй спринт [sprint_2](https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex/pull/2)
