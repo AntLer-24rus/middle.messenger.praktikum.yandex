@@ -1,0 +1,23 @@
+<div class="{{classes.text-field}} {{className}}">
+  {{>comp name="Label"
+      className=classes.text-field__label
+      inputName=inputName
+      text=label
+  }}
+  {{>comp name="Input"
+      className=classes.text-field__input
+      inputName=inputName 
+      placeholder=placeholder
+      value=value
+      type=type
+      validate=validate
+      disabled=disabled
+      $blur=validateInput
+      $focus=validateInput
+  }}
+  {{>comp name="Label"
+      className=classes.text-field__error
+      inputName=inputName
+      text=error
+  }}
+</div>

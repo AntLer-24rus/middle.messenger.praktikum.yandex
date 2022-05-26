@@ -1,0 +1,18 @@
+<div class="{{classes.user-view}}">
+  <div class="{{classes.user-view__avatar}}">
+    {{avatar}}
+  </div>
+  <div class="{{classes.user-view__info}} {{classes.info}}">
+    <div class="{{classes.info__user-name}}">
+      {{userName}}
+    </div>
+    <div class="{{classes.info__user-status}}">
+      {{status}}
+    </div>
+  </div>
+  {{>comp name="Icon" 
+      iconName="trash"
+      className=classes.user-view__remove-icon
+      $click=removeUser
+  }}
+</div>

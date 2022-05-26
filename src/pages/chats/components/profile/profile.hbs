@@ -1,0 +1,49 @@
+<div class="{{classes.overlay}}" style="{{#if isHide}} display: none;{{/if}}">
+  {{#>comp name="Card" className=@root.classes.profile}}
+    {{#>slot name="title"}}
+      <div class="{{@root.classes.profile__title}}">
+        Профиль пользователя
+        <div class="{{@root.classes.title__actions}}">
+          {{#if @root.isCurrentUser}}
+            {{>comp name="Icon" iconName=(@root.icon) $click=@root.editProfile}}
+          {{/if}}
+          {{>comp name="Icon" iconName="close" $click=close}}
+        </div>
+      </div>
+    {{/slot}}
+    {{#>slot name="body"}}
+      <div class="{{@root.classes.profile__body-wrapper}}">
+        <div class="
+              {{@root.classes.profile__avatar}}
+              {{#if @root.isEdit}}
+                {{@root.classes.profile__avatar_edit}}
+              {{/if}}
+            "
+            $click="changeAvatar"
+        >
+          {{@root.avatar}}
+        </div>
+        <div class="{{@root.classes.profile__error}}">{{@root.error}}</div>
+        <div class="{{@root.classes.profile__user-name}}">{{@root.profile.display_name}}</div>
+        {{#each @root.profile}}
+          {{>comp name="TextField"
+              inputName=@key
+              label=(@root.label)
+              value=this
+              validate=(@root.createValidator)
+              disabled=(@root.disableInput)
+              placeholder=(@root.placeholder)
+              className=(@root.inputClasses)
+          }}
+        {{/each}}
+      </div>
+    {{/slot}}
+    {{#if @root.isEdit}}
+      {{#>slot name="actions"}}
+        <div class="{{@root.classes.profile__action-wrapper}}">
+          {{>comp name="Button" text="Сменить пароль"}}
+        </div>
+      {{/slot}}
+    {{/if}}
+  {{/comp}}
+</div>

@@ -1,0 +1,30 @@
+{{#>comp name="Overlay"}}
+  {{#>slot name="content"}}
+    {{#>comp name="Card" className=@root.classes.user-list}}
+      {{#>slot name="title"}}
+        <div class="{{@root.classes.user-list__title}}">
+          Список участников
+          {{>comp name="Icon" iconName="close" $click=@root.hideUserList}}
+        </div>
+      {{/slot}}
+      {{#>slot name="body"}}
+        {{>comp name="TextField" placeholder="Поиск" className=@root.classes.user-list__search}}
+        <div class="{{@root.classes.user-list__list}}">
+          {{#each @root.users as | user |}}
+            {{>comp name="UserView"
+                userName=user.name status=user.status
+                $removeUser=@root.removeUser
+            }}
+          {{/each}}
+        </div>
+      {{/slot}}
+      {{#>slot name="actions"}}
+        {{>comp name="Button"
+            text="Удалить чат" type="stroke"
+            className=@root.classes.remove-btn
+            $click=@root.removeChat
+        }}
+      {{/slot}}
+    {{/comp}}
+  {{/slot}}
+{{/comp}}

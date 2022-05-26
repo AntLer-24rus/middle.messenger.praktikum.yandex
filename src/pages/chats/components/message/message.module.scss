@@ -1,0 +1,61 @@
+@import '../../../../utils/variables';
+
+.message {
+  max-width: 400px;
+  border-radius: 10px;
+  position: relative;
+  padding: 15px;
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  flex-wrap: wrap;
+
+  &__text {
+    flex-grow: 2;
+    line-height: 1rem;
+    font-size: $base-text;
+  }
+
+  &__time {
+    padding-top: 5px;
+    font-size: $slam-text;
+  }
+
+  &__status {
+    margin-left: 5px;
+  }
+
+  &_send {
+    background-color: $color-primary-light;
+    margin-right: 20px;
+
+    &::after {
+      content: '';
+      background-color: transparent;
+      position: absolute;
+      bottom: 0;
+      right: -30px;
+      width: 30px;
+      height: 10px;
+      border-bottom-left-radius: 10px;
+      box-shadow: -20px 0 $color-primary-light;
+    }
+  }
+
+  &_income {
+    background-color: $color-gray;
+    margin-left: 20px;
+
+    &::after {
+      content: '';
+      background-color: transparent;
+      position: absolute;
+      bottom: 0;
+      left: -30px;
+      width: 30px;
+      height: 10px;
+      border-bottom-right-radius: 10px;
+      box-shadow: 20px 0 $color-gray;
+    }
+  }
+}

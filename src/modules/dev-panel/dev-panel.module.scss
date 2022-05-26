@@ -1,0 +1,46 @@
+@import '../../utils/variables';
+
+.dev-panel {
+  height: 50px;
+  width: 100%;
+  background: $color-white;
+  font-size: 10pt;
+  color: $color-black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__title {
+    height: 30px;
+    padding: 5 0;
+  }
+
+  a {
+    color: $color-black;
+    display: inline-block;
+    width: 130px;
+    text-align: center;
+    text-decoration: none;
+    line-height: 20px;
+  }
+
+  ul {
+    li {
+      display: inline;
+
+      a {
+        border-right: 1px solid $color-gray;
+
+        &:hover {
+          background-color: $color-gray-extra-light;
+        }
+      }
+    }
+
+    li:last-child {
+      a {
+        border: none;
+      }
+    }
+  }
+}

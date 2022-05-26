@@ -1,3 +1,26 @@
-<div class='{{classes.chats-page}}'>
-  <h1>Chats page stub</h1>
+<div class="{{classes.chats-page}}">
+  <div class="{{classes.chats-preview}}">
+    <div class="{{classes.chats-preview__header}}">
+      {{>comp name="Icon" iconName="setting" $click=openSetting}}
+      {{>comp
+        name="TextField"
+        className=classes.search-field
+        placeholder="Поиск"
+      }}
+    </div>
+    {{>comp
+      name="ChatList"
+      className=classes.chats-preview__chats-list
+      chats=chats
+    }}
+  </div>
+  {{>comp
+    name="ChatView"
+    className=classes.chat-view
+    chatName="Chat 1"
+    messages=messages
+    $showChatInfo=showChatInfoRoot
+  }}
+  {{>comp name="UserList"}}
+  {{>comp name="Profile"}}
 </div>
