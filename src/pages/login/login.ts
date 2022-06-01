@@ -5,6 +5,7 @@ import {
   Component,
   defineHBSComponent,
   validator,
+  Router,
 } from '../../utils'
 import { Button, TextField, Card } from '../../components'
 
@@ -52,7 +53,7 @@ export default defineHBSComponent({
         click(e: Event) {
           e.preventDefault()
           e.stopPropagation()
-          global.console.log('Нет аккаунта?')
+          Router.instance().go('/signup')
         },
       },
     ],

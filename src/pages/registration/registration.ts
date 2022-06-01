@@ -5,6 +5,7 @@ import {
   collectFieldValues,
   Component,
   defineHBSComponent,
+  Router,
   validator,
 } from '../../utils'
 import { Button, TextField, Card } from '../../components'
@@ -86,8 +87,7 @@ export default defineHBSComponent({
         click(e: Event) {
           e.preventDefault()
           e.stopPropagation()
-
-          global.console.log('Уже есть аккаунт?')
+          Router.instance().go('/')
         },
       },
     ],

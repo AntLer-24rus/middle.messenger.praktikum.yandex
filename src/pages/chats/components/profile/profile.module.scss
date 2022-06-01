@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import '../../../../utils/variables';
 
 .overlay {
@@ -90,6 +91,12 @@
 
   &__user-name {
     font-size: $extra-large-text;
+  }
+
+  &__exit-btn {
+    color: $color-error;
+    border: 1px solid $color-error;
+    background-color: color.adjust($color-error, $lightness: 27%);
   }
 
   &__input {

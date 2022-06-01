@@ -20,6 +20,11 @@ type ComponentMeta = {
   name: string
 }
 
+export interface ExtendComponentConstructor<T extends Component = Component> {
+  new (options: Partial<ComponentOptions>): T
+  componentName: string
+}
+
 export interface ComponentInterface {
   mount(selector?: string): void
   name: string
@@ -218,7 +223,7 @@ export abstract class Component<DataType = any> implements ComponentInterface {
     // })
   }
 
-  protected get element(): HTMLElement {
+  get element(): HTMLElement {
     if (!this._element) throw new Error('Элемент еще не создан')
     return this._element as HTMLElement
   }

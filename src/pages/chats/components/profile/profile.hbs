@@ -38,12 +38,18 @@
         {{/each}}
       </div>
     {{/slot}}
-    {{#if @root.isEdit}}
-      {{#>slot name="actions"}}
-        <div class="{{@root.classes.profile__action-wrapper}}">
+    {{#>slot name="actions"}}
+      <div class="{{@root.classes.profile__action-wrapper}}">
+        {{#if @root.isEdit}}
           {{>comp name="Button" text="Сменить пароль"}}
-        </div>
-      {{/slot}}
-    {{/if}}
+        {{/if}}
+          {{>comp name="Button"
+                text="Выйти"
+                type="stroke"
+                $click=exit
+                className=@root.classes.profile__exit-btn
+          }}
+      </div>
+    {{/slot}}
   {{/comp}}
 </div>

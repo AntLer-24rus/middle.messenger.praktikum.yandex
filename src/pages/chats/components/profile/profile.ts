@@ -3,6 +3,7 @@ import {
   collectFieldValues,
   Component,
   defineHBSComponent,
+  Router,
   validator,
 } from '../../../../utils'
 import renderer from './profile.hbs'
@@ -44,6 +45,7 @@ type ProfileData = {
   inputClasses: (ctx: HBSContext<ProfileData>) => string
   editProfile: (this: Component<ProfileData & ProfileProps>) => void
   close: (this: Component<ProfileData & ProfileProps>) => void
+  exit: () => void
 }
 
 const fieldLabels: Record<string, string> = {
@@ -137,6 +139,9 @@ export default defineHBSComponent<ProfileData, ProfileProps>({
           tf.setProps({ error: '' })
         })
         profile.setProps({ isHide: true, isEdit: false, error: '' })
+      },
+      exit() {
+        Router.instance().go('/')
       },
     }
   },

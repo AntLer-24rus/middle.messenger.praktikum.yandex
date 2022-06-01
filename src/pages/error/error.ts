@@ -1,7 +1,7 @@
 import renderer from './error.hbs'
 import * as classes from './error.module.scss'
 import { Button, Card } from '../../components'
-import { defineHBSComponent } from '../../utils'
+import { defineHBSComponent, Router } from '../../utils'
 
 export default defineHBSComponent({
   name: 'Error',
@@ -13,6 +13,7 @@ export default defineHBSComponent({
     buttonType: 'stroke',
     btnClick() {
       global.console.log('Назад к чатам')
+      Router.instance().back()
     },
   }),
 })
