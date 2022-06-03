@@ -4,14 +4,27 @@ import { defineHBSComponent } from '../../../../utils'
 import { ChatPreview } from '../chat-preview'
 
 type ChatListProps = {
-  classes: typeof classes
   className: string
+  chats: any[]
 }
-type ChatListData = unknown
+type ChatListData = {
+  classes: typeof classes.default
+}
 
-export default defineHBSComponent<ChatListData, ChatListProps>({
+const props: ChatListProps = {
+  className: '',
+  chats: [],
+}
+const emits = {}
+export default defineHBSComponent({
   name: 'ChatList',
   renderer,
-  props: { classes, className: '' },
+  emits,
+  props,
   components: [ChatPreview],
+  data(): ChatListData {
+    return {
+      classes: classes as unknown as typeof classes.default,
+    }
+  },
 })

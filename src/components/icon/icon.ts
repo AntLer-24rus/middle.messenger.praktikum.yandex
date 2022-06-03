@@ -1,22 +1,39 @@
 import renderer from './icon.hbs'
 import * as classes from './icon.module.scss'
-
 import { defineHBSComponent } from '../../utils'
 
 type IconProps = {
-  classes: typeof classes
   iconName: string
-  className: string
+  className?: string
 }
-type IconData = unknown
 
-export default defineHBSComponent<IconData, IconProps>({
+type IconData = {
+  classes: typeof classes.default
+}
+
+const props: IconProps = {
+  iconName: 'setting',
+}
+const emits = {
+  click: 'Icon:click',
+}
+
+export default defineHBSComponent({
   name: 'Icon',
   renderer,
-  props: { classes, iconName: 'setting', className: '' },
-  nativeEvents: {
-    iconClick(e: Event) {
-      this.emit('Icon:click', e)
+  emits,
+  props,
+  data(): IconData {
+    return {
+      classes: classes as unknown as typeof classes.default,
+    }
+  },
+  DOMEvents: {
+    iconClick(e) {
+      e.preventDefault()
+      e.stopPropagation()
+
+      this.emit(emits.click, e)
     },
   },
 })

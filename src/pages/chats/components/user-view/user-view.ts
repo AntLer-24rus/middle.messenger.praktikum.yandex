@@ -12,19 +12,28 @@ type UserViewData = {
   avatar: string
   removeUser: (this: Component) => void
 }
-
-export default defineHBSComponent<UserViewData, UserViewProps>({
+const props: UserViewProps = {
+  classes,
+  userName: 'Default user name',
+  status: 'offline',
+}
+const emits = {
+  removeUser: 'UserView:removeUser',
+}
+export default defineHBSComponent({
   name: 'UserView',
   renderer,
-  props: { classes, userName: 'Default user name', status: 'offline' },
-  data(this: UserViewProps) {
+  emits,
+  props,
+  data(): UserViewData {
     return {
       avatar: this.userName
         .split(' ')
         .map((i) => i[0])
         .join(''),
       removeUser() {
-        this.parent!.emit('UserView:removeUser', this.id)
+        const userView = this.getParentByName('UserView')!
+        userView.emit(emits.removeUser, this.id)
       },
     }
   },

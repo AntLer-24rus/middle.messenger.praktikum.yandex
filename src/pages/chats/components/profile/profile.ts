@@ -10,7 +10,6 @@ import renderer from './profile.hbs'
 import * as classes from './profile.module.scss'
 
 type ProfileProps = {
-  classes: typeof classes.default
   isCurrentUser: boolean
   profile: {
     email: string
@@ -32,19 +31,20 @@ type HBSContext<P> = {
 }
 
 type ProfileData = {
+  classes: typeof classes.default
   isEdit: boolean
   avatar: string
   label: (ctx: HBSContext<ProfileData>) => string
   placeholder: (ctx: HBSContext<ProfileData>) => string
-  createValidator: (ctx: HBSContext<ProfileData>) => string
+  createValidator: (ctx: HBSContext<ProfileData>) => (arg: string) => string
   icon: (
     this: Component<ProfileData & ProfileProps>,
     ctx: HBSContext<ProfileData>
   ) => string
-  disableInput: (ctx: HBSContext<ProfileData>) => string
+  disableInput: (ctx: HBSContext<ProfileData>) => boolean
   inputClasses: (ctx: HBSContext<ProfileData>) => string
-  editProfile: (this: Component<ProfileData & ProfileProps>) => void
-  close: (this: Component<ProfileData & ProfileProps>) => void
+  editProfile: (this: Component<ProfileData, ProfileProps>) => void
+  close: (this: Component<ProfileData, ProfileProps>) => void
   exit: () => void
 }
 
@@ -65,26 +65,30 @@ const fieldPlaceholder: Record<string, string> = {
   phone: 'Ваш телефон',
 }
 
-export default defineHBSComponent<ProfileData, ProfileProps>({
+const props: ProfileProps = {
+  isCurrentUser: true,
+  profile: {
+    email: 'antler@inbox.ru',
+    login: 'AntLer',
+    first_name: 'Антон',
+    second_name: 'Сатышев',
+    display_name: 'AntLer',
+    phone: '+79141600607',
+  },
+  error: '',
+  isHide: true,
+}
+const emits = {}
+
+export default defineHBSComponent<ProfileProps, typeof emits, ProfileData>({
   name: 'Profile',
   renderer,
-  props: {
-    classes: classes as unknown as typeof classes.default,
-    isCurrentUser: true,
-    profile: {
-      email: 'antler@inbox.ru',
-      login: 'AntLer',
-      first_name: 'Антон',
-      second_name: 'Сатышев',
-      display_name: 'AntLer',
-      phone: '+79141600607',
-    },
-    error: '',
-    isHide: true,
-  },
+  emits,
+  props,
   components: [Icon, TextField],
-  data(this: ProfileProps) {
+  data() {
     return {
+      classes: classes as unknown as typeof classes.default,
       isEdit: false,
       avatar: this.profile.display_name
         .split(' ')
@@ -123,11 +127,14 @@ export default defineHBSComponent<ProfileData, ProfileProps>({
 
         if (isEdit) {
           const card = profileComp.getChildrenByName('Card')!
-          const textFields = card.children.filter((c) => c.name === 'TextField')
+          const children = card.children as unknown as ReadonlyArray<Component>
+          const isTextField = (c: InstanceType<typeof TextField>) =>
+            c.name === 'TextField'
+          const textFields = children.filter(isTextField)
           const formData = collectFieldValues(textFields)
           global.console.log('save', formData)
           if (!formData.valid) return
-          profile = formData.data
+          profile = formData.data as typeof profile
         }
         profileComp.setProps({ isEdit: !isEdit, profile })
       },
@@ -145,7 +152,7 @@ export default defineHBSComponent<ProfileData, ProfileProps>({
       },
     }
   },
-  nativeEvents: {
+  DOMEvents: {
     changeAvatar() {
       if (this.data.isEdit) {
         this.data.error = 'Ошибка смены аватара'

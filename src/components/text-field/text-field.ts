@@ -15,27 +15,32 @@ type TextFieldProps = {
 
 type TextFieldData = {
   classes: typeof classes
-  type: string
+  type: 'text' | 'password'
   validateInput: (
-    this: Component<TextFieldData & TextFieldProps>,
+    this: Component<TextFieldData, TextFieldProps>,
     value?: string
   ) => string
 }
 
-export type TextFieldComp = Component<TextFieldData & TextFieldProps>
+export type TextFieldComp = Component<TextFieldData, TextFieldProps>
 
-export default defineHBSComponent<TextFieldData, TextFieldProps>({
+const props: TextFieldProps = {
+  validate: () => '',
+  value: '',
+  disabled: false,
+  inputName: 'text-filed',
+  placeholder: 'введите текст',
+  error: '',
+}
+const emits = {}
+
+export default defineHBSComponent({
   name: 'TextField',
   renderer,
-  props: {
-    validate: () => '',
-    value: '',
-    disabled: false,
-    inputName: 'text-filed',
-    placeholder: 'введите текст',
-    error: '',
-  },
-  data(this: TextFieldProps) {
+  emits,
+  props,
+  components: [Input, Label],
+  data(): TextFieldData {
     return {
       classes,
       type: this.inputName === 'password' ? 'password' : 'text',
@@ -44,9 +49,11 @@ export default defineHBSComponent<TextFieldData, TextFieldProps>({
         const error = this.data.validate(value)
 
         const textField = this.getParentByName('TextField')!
-        const errorLabel = textField.children.find(
-          (c) => c.name === 'Label' && c.data.className.includes('error')
-        )!
+        const children =
+          textField.children as unknown as ReadonlyArray<Component>
+        const isErrorLabel = (c: InstanceType<typeof Label>) =>
+          c.name === 'Label' && c.data.className?.includes('error')
+        const errorLabel = children.find(isErrorLabel)!
         const input = textField.getChildrenByName('Input')!
 
         textField.data.error = error
@@ -58,5 +65,4 @@ export default defineHBSComponent<TextFieldData, TextFieldProps>({
       },
     }
   },
-  components: [Input, Label],
 })

@@ -9,53 +9,80 @@ import {
 } from '../../utils'
 import { Button, TextField, Card } from '../../components'
 
+type LoginPageProps = Record<string, never>
+type LoginPageData = {
+  classes: typeof classes.default
+  inputs: {
+    name: string
+    label: string
+    placeholder: string
+    error: string
+    validate(arg: string): string
+  }[]
+  buttons: {
+    text: string
+    type: 'filled' | 'stroke'
+    click(this: InstanceType<typeof Button>, e: Event): void
+  }[]
+}
+
+const props: LoginPageProps = {}
+const emits = {}
+
 export default defineHBSComponent({
   name: 'LoginPage',
-  components: [TextField, Button, Card],
   renderer,
-  props: {},
-  data: () => ({
-    classes,
-    inputs: [
-      {
-        name: 'login',
-        label: 'Логин',
-        placeholder: 'Ваш логин',
-        error: '',
-        validate: (value: string) => validator('login', value),
-      },
-      {
-        name: 'password',
-        label: 'Пароль',
-        placeholder: 'Ваш пароль',
-        error: '',
-        validate: (value: string) => validator('password', value),
-      },
-    ],
-    buttons: [
-      {
-        text: 'Войти',
-        type: 'filled',
-        click(this: Component, e: Event) {
-          e.preventDefault()
-          e.stopPropagation()
+  emits,
+  props,
+  components: [TextField, Button, Card],
+  data(): LoginPageData {
+    return {
+      classes: classes as unknown as typeof classes.default,
+      inputs: [
+        {
+          name: 'login',
+          label: 'Логин',
+          placeholder: 'Ваш логин',
+          error: '',
+          validate: (value: string) => validator('login', value),
+        },
+        {
+          name: 'password',
+          label: 'Пароль',
+          placeholder: 'Ваш пароль',
+          error: '',
+          validate: (value: string) => validator('password', value),
+        },
+      ],
+      buttons: [
+        {
+          text: 'Войти',
+          type: 'filled',
+          click(e) {
+            e.preventDefault()
+            e.stopPropagation()
 
-          const loginPage = this.getParentByName('LoginPage')!
-          const card = loginPage.getChildrenByName('Card')!
-          const textFields = card.children.filter((c) => c.name === 'TextField')
-          const formData = collectFieldValues(textFields)
-          global.console.log('login data :>> ', formData)
+            const loginPage = this.getParentByName('LoginPage')!
+            const card = loginPage.getChildrenByName('Card')!
+            const children =
+              card.children as unknown as ReadonlyArray<Component>
+            const isTextField = (c: InstanceType<typeof TextField>) =>
+              c.name === 'TextField'
+            const textFields = children.filter(isTextField)
+            const formData = collectFieldValues(textFields)
+            global.console.log('login data :>> ', formData)
+          },
         },
-      },
-      {
-        text: 'Нет аккаунта?',
-        type: 'stroke',
-        click(e: Event) {
-          e.preventDefault()
-          e.stopPropagation()
-          Router.instance().go('/signup')
+        {
+          text: 'Нет аккаунта?',
+          type: 'stroke',
+          click(e: Event) {
+            e.preventDefault()
+            e.stopPropagation()
+            Router.instance().go('/signup')
+          },
         },
-      },
-    ],
-  }),
+      ],
+    }
+  },
 })

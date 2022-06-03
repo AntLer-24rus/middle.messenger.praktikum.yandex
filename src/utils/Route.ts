@@ -11,7 +11,7 @@ export class Route {
 
   private _block: Component | null
 
-  private _props: unknown
+  private _props: any
 
   constructor(
     pathname: string,

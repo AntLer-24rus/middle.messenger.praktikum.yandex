@@ -2,29 +2,36 @@ import renderer from './button.hbs'
 import * as classes from './button.module.scss'
 import { defineHBSComponent } from '../../utils'
 
-type ButtonData = {
-  isStroke: boolean
-}
 type ButtonProps = {
-  classes: typeof classes.default
   type: 'stroke' | 'filled'
 }
 
-export default defineHBSComponent<ButtonData, ButtonProps>({
+type ButtonData = {
+  classes: typeof classes.default
+  isStroke: boolean
+}
+
+const props: ButtonProps = { type: 'stroke' }
+const emits = {
+  click: 'Button:click',
+}
+export default defineHBSComponent({
   name: 'Button',
-  props: {
-    classes: classes as unknown as typeof classes.default,
-    type: 'stroke',
-  },
   renderer,
-  data() {
+  emits,
+  props,
+  data(): ButtonData {
     return {
+      classes: classes as unknown as typeof classes.default,
       isStroke: this.type === 'stroke',
     }
   },
-  nativeEvents: {
-    buttonClick(e: Event) {
-      this.emit('Button:click', e)
+  DOMEvents: {
+    buttonClick(e) {
+      e.preventDefault()
+      e.stopPropagation()
+
+      this.emit(emits.click, e)
     },
   },
 })
