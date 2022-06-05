@@ -1,8 +1,8 @@
-import renderer from './chat-view.hbs'
-import * as classes from './chat-view.module.scss'
+import { Icon, TextField } from '../../../../components'
 import { Component, defineHBSComponent } from '../../../../utils'
 import { Message } from '../message'
-import { Icon, TextField } from '../../../../components'
+import renderer from './chat-view.hbs'
+import * as classes from './chat-view.module.scss'
 
 type Message = {
   isSend: boolean
@@ -29,14 +29,17 @@ type ChatViewData = {
     this: Component<ChatViewData & ChatViewProps>,
     e: Event
   ) => void
+  sendMessage: (this: InstanceType<typeof TextField>, message: string) => void
 }
 
 const props: ChatViewProps = {
   chatName: '',
 }
-const emits = {}
+const emits = {
+  sendMessage: 'ChatView:sendMessage',
+}
 
-export default defineHBSComponent({
+const ChatView = defineHBSComponent({
   name: 'ChatView',
   renderer,
   emits,
@@ -55,6 +58,15 @@ export default defineHBSComponent({
         else messageClasses.push(cls.message_income)
         return messageClasses.join(' ')
       },
+      sendMessage(message) {
+        const chatView = this.getParentByName('ChatView') as InstanceType<
+          typeof ChatView
+        >
+        chatView.emit(ChatView.emits.sendMessage, message)
+        this.setProps({ value: '' })
+      },
     }
   },
 })
+
+export default ChatView
