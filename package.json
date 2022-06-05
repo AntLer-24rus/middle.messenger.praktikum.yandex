@@ -8,7 +8,7 @@
     "build": "npm run check && cross-env NODE_ENV=development parcel build src/index.html",
     "clean": "rimraf dist .parcel-cache",
     "check": "tsc --noEmit",
-    "lint": "eslint src/**/*.ts && stylelint '**/*.scss'"
+    "lint": "eslint --ext 'ts' src/ && stylelint '**/*.scss'"
   },
   "repository": {
     "type": "git",
