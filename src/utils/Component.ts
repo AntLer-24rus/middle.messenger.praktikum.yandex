@@ -1,6 +1,10 @@
-/* eslint no-param-reassign: ["error", { "props": false }] */
+/* eslint
+    no-param-reassign: ["error", { "props": false }],
+    @typescript-eslint/no-explicit-any: off
+*/
 import { v4 as uuid } from 'uuid'
-import { EventBus } from './EventBus'
+import { Callback, EventBus, EventBusInterface } from './EventBus'
+import { isEqual } from './isEqual'
 import { Tree } from './Tree'
 
 type DataFunction<T1, T2> = (this: T1) => T2
@@ -13,12 +17,14 @@ type ComponentMeta = {
 export interface ComponentInterface<DataType, PropsType> {
   id: string
   name: string
-  children: ReadonlyArray<this>
-  parent: this | undefined
+  children: ReadonlyArray<ComponentInterface<any, any>>
+  parent: ComponentInterface<any, any> | undefined
   data: DataType & PropsType
+  element: HTMLElement
+  needUpdate: boolean
   appendChildren(child: this): this
-  getParentByName(name: string): this | undefined
-  getChildrenByName(name: string): this | undefined
+  getParentByName(name: string): ComponentInterface<any, any> | undefined
+  getChildrenByName(name: string): ComponentInterface<any, any> | undefined
   getContent(): Element
   setProps(props: Partial<DataType & PropsType>): void
 
@@ -45,7 +51,7 @@ export abstract class Component<
     PropsType extends object = any
   >
   extends Tree
-  implements ComponentInterface<DataType, PropsType>
+  implements ComponentInterface<DataType, PropsType>, EventBusInterface
 {
   static EVENT_PREFIX = '$'
 
@@ -63,7 +69,10 @@ export abstract class Component<
 
   public data: DataType & PropsType
 
-  private _DOMevents: Record<string, (e: Event) => void> = {}
+  private _DOMEvents: Record<
+    string,
+    (this: ComponentInterface<DataType, PropsType>, e: Event) => void
+  > = {}
 
   private _eventBus: EventBus = new EventBus()
 
@@ -92,8 +101,7 @@ export abstract class Component<
     this.data = new Proxy(prepData, {
       set: (target: any, prop, value) => {
         if (Object.prototype.hasOwnProperty.call(target, prop)) {
-          const updated = JSON.stringify(target[prop]) !== JSON.stringify(value)
-          if (updated) {
+          if (!isEqual(target[prop], value)) {
             this.needUpdate = true
             target[prop] = value
           }
@@ -103,16 +111,13 @@ export abstract class Component<
       },
     })
 
-    this._DOMevents = DOMEvents
+    this._DOMEvents = DOMEvents
     this._registerEvents(listeners)
   }
 
-  // private _prepareData(
-  //   data?: DataFunction<PropsType, DataType>,
-  //   props?: PropsType
-  // ) {
-
-  // }
+  off(eventName: string, callback: Callback): void {
+    this._eventBus.off(eventName, callback)
+  }
 
   protected abstract render(context: any): DocumentFragment
 
@@ -166,7 +171,7 @@ export abstract class Component<
   }
 
   private _callNativeEvent(methodName: string, e: Event) {
-    const method = this._DOMevents[methodName]
+    const method = this._DOMEvents[methodName]
     if (method && typeof method === 'function') {
       this.callEventInContext(method, e)
     } else {
@@ -237,7 +242,7 @@ export abstract class Component<
     return this._meta.name
   }
 
-  public getParentByName(name: string): this | undefined {
+  public getParentByName(name: string): Component<any, any> | undefined {
     if (this.name === name) {
       return this
     }
@@ -248,7 +253,7 @@ export abstract class Component<
     return parent.getParentByName(name)
   }
 
-  public getChildrenByName(name: string): this | undefined {
+  public getChildrenByName(name: string): Component<any, any> | undefined {
     return this.children.find((c) => c.name === name)
   }
 
@@ -263,8 +268,12 @@ export abstract class Component<
     this._eventBus.emit(Component.emits.UPDATE, props)
   }
 
-  public emit(eventName: string, ...args: any) {
-    this._eventBus.emit(eventName, ...args)
+  public on(event: string, callback: (...a: unknown[]) => void) {
+    this._eventBus.on(event, callback)
+  }
+
+  public emit(eventName: string, ...args: unknown[]) {
+    return this._eventBus.emit(eventName, ...args)
   }
 
   public show() {
