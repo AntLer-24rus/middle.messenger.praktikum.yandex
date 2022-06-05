@@ -1,3 +1,7 @@
+/* eslint
+    no-underscore-dangle: ["error", { "allow": ["_parent", "_children", "_reparent"] }]
+    no-param-reassign: ["error", { "props": false }]
+*/
 export abstract class Tree {
   protected _parent?: this
 
