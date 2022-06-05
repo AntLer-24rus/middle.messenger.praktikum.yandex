@@ -1,13 +1,7 @@
+import { Button, Card, TextField } from '../../components'
+import { collectFieldValues, defineHBSComponent, validator } from '../../utils'
 import renderer from './login.hbs'
 import * as classes from './login.module.scss'
-import {
-  collectFieldValues,
-  Component,
-  defineHBSComponent,
-  validator,
-  Router,
-} from '../../utils'
-import { Button, TextField, Card } from '../../components'
 
 type LoginPageProps = Record<string, never>
 type LoginPageData = {
@@ -27,7 +21,10 @@ type LoginPageData = {
 }
 
 const props: LoginPageProps = {}
-const emits = {}
+const emits = {
+  signIn: 'LoginPage:signin',
+  signUp: 'LoginPage:signUp',
+}
 
 export default defineHBSComponent({
   name: 'LoginPage',
@@ -64,22 +61,24 @@ export default defineHBSComponent({
 
             const loginPage = this.getParentByName('LoginPage')!
             const card = loginPage.getChildrenByName('Card')!
-            const children =
-              card.children as unknown as ReadonlyArray<Component>
-            const isTextField = (c: InstanceType<typeof TextField>) =>
-              c.name === 'TextField'
-            const textFields = children.filter(isTextField)
+            const textFields = card.children.filter(
+              ({ name }) => name === 'TextField'
+            )
             const formData = collectFieldValues(textFields)
-            global.console.log('login data :>> ', formData)
+            if (formData.valid) {
+              loginPage.emit(emits.signIn, formData.data)
+            }
           },
         },
         {
           text: 'Нет аккаунта?',
           type: 'stroke',
-          click(e: Event) {
+          click(e) {
             e.preventDefault()
             e.stopPropagation()
-            Router.instance().go('/signup')
+
+            const loginPage = this.getParentByName('LoginPage')!
+            loginPage.emit(emits.signUp)
           },
         },
       ],
