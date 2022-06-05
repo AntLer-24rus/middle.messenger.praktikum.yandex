@@ -2,9 +2,9 @@ import { ChatsPage } from '../pages'
 import { Profile } from '../pages/chats'
 import { CreateChat } from '../pages/chats/components/create-chat'
 import { UserList } from '../pages/chats/components/user-list'
-import { ChatsService } from '../services'
-import { ChatsResponse } from '../type/api'
-import { cloneDeep, connect, Controller } from '../utils'
+import { AuthService, ChatsService, RealTimeMessageService } from '../services'
+import { ChatsResponse, InstantMessage, UserResponse } from '../type/api'
+import { cloneDeep, connect, Controller, disconnect } from '../utils'
 import { ProfileController } from './Profile.controller'
 import { UserListController } from './UserList.controller'
 
@@ -15,9 +15,13 @@ export class ChatsPageController extends Controller<
 
   private _chatsService = new ChatsService()
 
+  private _authService = new AuthService()
+
   private _profileController: ProfileController
 
   private _userListController: UserListController
+
+  private _realTimeMessageService: RealTimeMessageService | null = null
 
   constructor(options: ConstructorParameters<typeof ChatsPage>[0]) {
     super(new ChatsPage(options))
@@ -39,6 +43,12 @@ export class ChatsPageController extends Controller<
       ChatsPage.emits.showSettings,
       this._profileController,
       ProfileController.listening.userInfo
+    )
+    connect(
+      this.baseComponent,
+      ChatsPage.emits.selectChat,
+      this._chatsService,
+      ChatsService.listening.token
     )
 
     this._userListController = new UserListController(userList)
@@ -104,7 +114,77 @@ export class ChatsPageController extends Controller<
       this._userListController,
       UserListController.listening.close
     )
+
     this._chatsService.emit(ChatsService.listening.updateChats)
+    this._authService.emit(AuthService.listening.userInfo)
+
+    connect(
+      this._authService,
+      AuthService.emits.userInfo,
+      (user: UserResponse) => {
+        connect(
+          this._chatsService,
+          ChatsService.emits.token,
+          this,
+          (chatId: number, token: string) => {
+            this._selectChat(user.id, chatId, token)
+          }
+        )
+      }
+    )
+  }
+
+  private _selectChat(userId: number, chatId: number, token: string) {
+    const currentChat = this.baseComponent.data.chats.find(
+      ({ id }) => id === chatId
+    )
+
+    const sendMessage = (message: string) => {
+      if (!this._realTimeMessageService) {
+        throw new Error('Нет подключения для отправки сообщения')
+      }
+      this._realTimeMessageService.emit(
+        RealTimeMessageService.listening.sendMessage,
+        message
+      )
+    }
+
+    if (this._realTimeMessageService !== null) {
+      disconnect(this.baseComponent, ChatsPage.emits.sendMessage, sendMessage)
+      this._realTimeMessageService = null
+    }
+    this._realTimeMessageService = new RealTimeMessageService(
+      userId,
+      chatId,
+      token
+    )
+    connect(
+      this._realTimeMessageService,
+      RealTimeMessageService.emits.open,
+      () => {
+        if (!this._realTimeMessageService) {
+          throw new Error('Нет подключения...')
+        }
+        connect(this.baseComponent, ChatsPage.emits.sendMessage, sendMessage)
+        connect(
+          this._realTimeMessageService,
+          RealTimeMessageService.emits.message,
+          (newMessage: InstantMessage) => {
+            const messages = cloneDeep(this.baseComponent.data.messages)
+
+            messages.push({
+              date: new Date(newMessage.time),
+              isSend: userId === Number(newMessage.user_id),
+              text: newMessage.content,
+              type: 'income',
+            })
+
+            this.baseComponent.setProps({ messages })
+          }
+        )
+        this.baseComponent.setProps({ currentChat })
+      }
+    )
   }
 
   private _updateChats(newChats: ChatsResponse[]) {
