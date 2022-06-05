@@ -17,10 +17,10 @@
     </div>
     {{#if chatInfo.last_message}}
       <div class="{{classes.info__time}}">
-        time
+        {{lastMessageTime}}
       </div>
       <div class="{{classes.info__last-msg}}">
-        last msg
+        {{chatInfo.last_message.content}}
       </div>
     {{/if}}
     {{#if hasUnread}}
