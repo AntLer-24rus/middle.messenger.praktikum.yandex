@@ -1,5 +1,5 @@
-import renderer from './input.hbs'
 import { defineHBSComponent } from '../../../../utils'
+import renderer from './input.hbs'
 
 type InputPropsType = {
   className: string
@@ -21,6 +21,7 @@ const props: InputPropsType = {
 const emits = {
   blur: 'Input:blur',
   focus: 'Input:focus',
+  enter: 'Input:enter',
 }
 
 export default defineHBSComponent({
@@ -38,6 +39,13 @@ export default defineHBSComponent({
       e.stopPropagation()
       const { value } = e.target as HTMLInputElement
       this.emit(emits.focus, value)
+    },
+    keyup(e) {
+      e.stopPropagation()
+      if ((e as KeyboardEvent).key === 'Enter') {
+        const { value } = e.target as HTMLInputElement
+        this.emit(emits.enter, value)
+      }
     },
   },
 })

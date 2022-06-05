@@ -1,8 +1,9 @@
-import renderer from './text-field.hbs'
-import * as classes from './text-field.module.scss'
-import { defineHBSComponent, Component } from '../../utils'
+/* eslint no-use-before-define: "off" */
+import { defineHBSComponent, HBSComponentInterface } from '../../utils'
 import { Input } from './modules/input'
 import { Label } from './modules/label'
+import renderer from './text-field.hbs'
+import * as classes from './text-field.module.scss'
 
 type TextFieldProps = {
   validate: (val: string) => string
@@ -16,13 +17,14 @@ type TextFieldProps = {
 type TextFieldData = {
   classes: typeof classes
   type: 'text' | 'password'
-  validateInput: (
-    this: Component<TextFieldData, TextFieldProps>,
-    value?: string
-  ) => string
+  validateInput: (this: TextFieldInstance, value?: string) => string
+  enter: (this: InstanceType<typeof Input>, value: string) => void
 }
 
-export type TextFieldComp = Component<TextFieldData, TextFieldProps>
+export type TextFieldInstance = HBSComponentInterface<
+  TextFieldData,
+  TextFieldProps
+>
 
 const props: TextFieldProps = {
   validate: () => '',
@@ -32,7 +34,9 @@ const props: TextFieldProps = {
   placeholder: 'введите текст',
   error: '',
 }
-const emits = {}
+const emits = {
+  enter: 'TextField:enter',
+}
 
 export default defineHBSComponent({
   name: 'TextField',
@@ -43,15 +47,18 @@ export default defineHBSComponent({
   data(): TextFieldData {
     return {
       classes,
-      type: this.inputName === 'password' ? 'password' : 'text',
+      type: this.inputName.toLowerCase().includes('password')
+        ? 'password'
+        : 'text',
       validateInput(inputValue) {
-        const value = inputValue ?? this.data.value
-        const error = this.data.validate(value)
+        const textField = this.getParentByName('TextField') as TextFieldInstance
 
-        const textField = this.getParentByName('TextField')!
+        const value = inputValue ?? this.data.value
+        const error = this.data.validate.call(textField, value)
+
         const children =
-          textField.children as unknown as ReadonlyArray<Component>
-        const isErrorLabel = (c: InstanceType<typeof Label>) =>
+          textField.children as ReadonlyArray<HBSComponentInterface>
+        const isErrorLabel = (c: HBSComponentInterface) =>
           c.name === 'Label' && c.data.className?.includes('error')
         const errorLabel = children.find(isErrorLabel)!
         const input = textField.getChildrenByName('Input')!
@@ -62,6 +69,12 @@ export default defineHBSComponent({
         errorLabel.setProps({ text: error })
         input.setProps({ value })
         return error
+      },
+      enter(value) {
+        const textField = this.getParentByName('TextField') as TextFieldInstance
+        textField.data.value = value
+        textField.needUpdate = false
+        textField.emit(emits.enter, value)
       },
     }
   },
