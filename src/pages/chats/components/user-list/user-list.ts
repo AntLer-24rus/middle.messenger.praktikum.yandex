@@ -1,49 +1,42 @@
-import { Card, Icon, Overlay } from '../../../../components'
+import { Card, Icon, Overlay, TextField } from '../../../../components'
+import { ChatUserResponse } from '../../../../type/api'
 import { Component, defineHBSComponent } from '../../../../utils'
 import { UserView } from '../user-view'
 import renderer from './user-list.hbs'
 import * as classes from './user-list.module.scss'
 
 type UserListProps = {
-  users: {
-    name: string
-    status: string
-  }[]
+  isHide: boolean
+  users: ChatUserResponse
+  chatId: number
+  currentUserId: number
 }
 type UserListData = {
   classes: typeof classes.default
+  searchString: string
   hideUserList: (this: Component) => void
-  removeUser: (this: Component, user: any) => void
+  removeUser: (this: InstanceType<typeof UserView>, userId: number) => void
+  addUser: (this: InstanceType<typeof UserView>, userId: number) => void
   removeChat: (this: Component) => void
+  removeChatName: (this: UserListProps & UserListData) => string
+  search: (this: InstanceType<typeof TextField>, value: string) => void
 }
 
 const props: UserListProps = {
-  users: [
-    {
-      name: 'User 1',
-      status: 'online',
-    },
-    {
-      name: 'User 2',
-      status: 'online',
-    },
-    {
-      name: 'User 3',
-      status: 'online',
-    },
-    {
-      name: 'User 4',
-      status: 'online',
-    },
-    {
-      name: 'User 5',
-      status: 'online',
-    },
-  ],
+  isHide: true,
+  users: [],
+  chatId: 1,
+  currentUserId: 1,
 }
-const emits = {}
+const emits = {
+  close: 'UserList:close',
+  search: 'UserView:search',
+  removeUser: 'UserView:removeUser',
+  addUser: 'UserView:addUser',
+  removeChat: 'UserView:removeChat',
+}
 
-export default defineHBSComponent({
+const UserList = defineHBSComponent({
   name: 'UserList',
   renderer,
   emits,
@@ -52,16 +45,57 @@ export default defineHBSComponent({
   data(): UserListData {
     return {
       classes: classes as unknown as typeof classes.default,
+      searchString: '',
       hideUserList() {
-        const overlay = this.getParentByName('Overlay')!
-        overlay.hide()
+        const userList = this.getParentByName('UserList') as InstanceType<
+          typeof UserList
+        >
+        userList.emit(emits.close)
       },
-      removeUser(user: any) {
-        global.console.log('Удалить юзера', user)
+      removeUser(userId: number) {
+        const userList = this.getParentByName('UserList') as InstanceType<
+          typeof UserList
+        >
+        userList.emit(emits.removeUser, [userId], userList.data.chatId)
+      },
+      addUser(userId: number) {
+        const userList = this.getParentByName('UserList') as InstanceType<
+          typeof UserList
+        >
+        userList.emit(emits.addUser, [userId], userList.data.chatId)
       },
       removeChat() {
-        global.console.log('Удалить чат', this.id)
+        const userList = this.getParentByName('UserList') as InstanceType<
+          typeof UserList
+        >
+        if (userList.data.removeChatName() === 'Удалить чат') {
+          userList.emit(emits.removeChat, userList.data.chatId)
+        } else {
+          userList.emit(
+            emits.removeUser,
+            [userList.data.currentUserId],
+            userList.data.chatId
+          )
+        }
+      },
+      removeChatName() {
+        const currentUser = this.users.find(
+          (user) => this.currentUserId === user.id
+        )
+        return currentUser && currentUser.role === 'admin'
+          ? 'Удалить чат'
+          : 'Покинуть чат'
+      },
+      search(value) {
+        const userList = this.getParentByName('UserList') as InstanceType<
+          typeof UserList
+        >
+        userList.data.searchString = value
+        userList.needUpdate = false
+        userList.emit(emits.search, value)
       },
     }
   },
 })
+
+export default UserList

@@ -1,11 +1,11 @@
 import { Icon, TextField } from '../../../../components'
 import {
-  collectFieldValues,
   Component,
   defineHBSComponent,
-  Router,
+  HBSComponentInterface,
   validator,
 } from '../../../../utils'
+import { PasChange } from './paschange'
 import renderer from './profile.hbs'
 import * as classes from './profile.module.scss'
 
@@ -16,9 +16,10 @@ type ProfileProps = {
     login: string
     first_name: string
     second_name: string
-    display_name: string
+    display_name: string | null
     phone: string
   }
+  avatar: string
   error: string
   isHide: boolean
 }
@@ -33,7 +34,7 @@ type HBSContext<P> = {
 type ProfileData = {
   classes: typeof classes.default
   isEdit: boolean
-  avatar: string
+  userAvatar: (this: ProfileData & ProfileProps) => string
   label: (ctx: HBSContext<ProfileData>) => string
   placeholder: (ctx: HBSContext<ProfileData>) => string
   createValidator: (ctx: HBSContext<ProfileData>) => (arg: string) => string
@@ -44,8 +45,9 @@ type ProfileData = {
   disableInput: (ctx: HBSContext<ProfileData>) => boolean
   inputClasses: (ctx: HBSContext<ProfileData>) => string
   editProfile: (this: Component<ProfileData, ProfileProps>) => void
+  editPassword: (this: Component<ProfileData, ProfileProps>) => void
   close: (this: Component<ProfileData, ProfileProps>) => void
-  exit: () => void
+  exit: (this: Component<ProfileData, ProfileProps>) => void
 }
 
 const fieldLabels: Record<string, string> = {
@@ -67,6 +69,7 @@ const fieldPlaceholder: Record<string, string> = {
 
 const props: ProfileProps = {
   isCurrentUser: true,
+  avatar: '',
   profile: {
     email: 'antler@inbox.ru',
     login: 'AntLer',
@@ -78,22 +81,36 @@ const props: ProfileProps = {
   error: '',
   isHide: true,
 }
-const emits = {}
+const emits = {
+  exit: 'Profile:exit',
+  close: 'Profile:close',
+  editProfile: 'Profile:editProfile',
+  changeAvatar: 'Profile:changeAvatar',
+  changePassword: 'Profile:changePassword',
+}
+
+export type ProfileInstance = HBSComponentInterface<ProfileData, ProfileProps>
 
 export default defineHBSComponent<ProfileProps, typeof emits, ProfileData>({
   name: 'Profile',
   renderer,
   emits,
   props,
-  components: [Icon, TextField],
+  components: [Icon, TextField, PasChange],
   data() {
     return {
       classes: classes as unknown as typeof classes.default,
       isEdit: false,
-      avatar: this.profile.display_name
-        .split(' ')
-        .map((i) => i[0])
-        .join(''),
+      userAvatar() {
+        const { display_name, first_name, second_name } = this.profile
+        return display_name
+          ? display_name
+              .split(' ')
+              .map((word) => word[0])
+              .slice(0, 2)
+              .join('')
+          : `${first_name[0]}${second_name[0]}`
+      },
       label({ data: { key } }) {
         if (!key) throw new Error('Неверное использование label()')
         return fieldLabels[key]
@@ -121,41 +138,27 @@ export default defineHBSComponent<ProfileProps, typeof emits, ProfileData>({
         return inputClasses.join(' ')
       },
       editProfile() {
-        const profileComp = this.getParentByName('Profile')!
-        const { isEdit } = profileComp.data
-        let { profile } = profileComp.data
-
-        if (isEdit) {
-          const card = profileComp.getChildrenByName('Card')!
-          const children = card.children as unknown as ReadonlyArray<Component>
-          const isTextField = (c: InstanceType<typeof TextField>) =>
-            c.name === 'TextField'
-          const textFields = children.filter(isTextField)
-          const formData = collectFieldValues(textFields)
-          global.console.log('save', formData)
-          if (!formData.valid) return
-          profile = formData.data as typeof profile
-        }
-        profileComp.setProps({ isEdit: !isEdit, profile })
+        const profile = this.getParentByName('Profile')!
+        profile.emit(emits.editProfile)
+      },
+      editPassword() {
+        const profile = this.getParentByName('Profile')!
+        profile.emit(emits.changePassword)
       },
       close() {
         const profile = this.getParentByName('Profile')!
-        const card = profile.getChildrenByName('Card')!
-        const textFields = card.children.filter((c) => c.name === 'TextField')
-        textFields.forEach((tf) => {
-          tf.setProps({ error: '' })
-        })
-        profile.setProps({ isHide: true, isEdit: false, error: '' })
+        profile.emit(emits.close)
       },
       exit() {
-        Router.instance().go('/')
+        const profile = this.getParentByName('Profile')!
+        profile.emit(emits.exit)
       },
     }
   },
   DOMEvents: {
     changeAvatar() {
       if (this.data.isEdit) {
-        this.data.error = 'Ошибка смены аватара'
+        this.emit(emits.changeAvatar)
       }
     },
   },

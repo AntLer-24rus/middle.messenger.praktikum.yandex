@@ -1,9 +1,32 @@
-<div class='{{classes.chat-preview}}'>
-  <div class='{{classes.chat-preview__avatar}}'>CN</div>
-  <div class='{{classes.chat-preview__info}} {{classes.info}}'>
-    <div class='{{classes.info__chat-name}}'>chat name</div>
-    <div class='{{classes.info__time}}'>time</div>
-    <div class='{{classes.info__last-msg}}'>last msg</div>
-    <div class='{{classes.info__badge}}'>1</div>
+<div class="{{classes.chat-preview}}
+     {{#if selected}}
+        {{classes.chat-preview_selected}}
+     {{/if}}
+     "
+     $click="chatClick">
+  <div class="{{classes.chat-preview__avatar}}">
+    {{#if chatInfo.avatar}}
+      <img src="{{chatInfo.avatar}}" alt="{{avatarAlt}}" />
+    {{else}}
+      {{avatarAlt}}
+    {{/if}}
+  </div>
+  <div class="{{classes.chat-preview__info}} {{classes.info}}">
+    <div class="{{classes.info__chat-name}}">
+      {{chatInfo.title}}
+    </div>
+    {{#if chatInfo.last_message}}
+      <div class="{{classes.info__time}}">
+        time
+      </div>
+      <div class="{{classes.info__last-msg}}">
+        last msg
+      </div>
+    {{/if}}
+    {{#if hasUnread}}
+      <div class="{{classes.info__badge}}">
+        {{chatInfo.unread_count}}
+      </div>
+    {{/if}}
   </div>
 </div>

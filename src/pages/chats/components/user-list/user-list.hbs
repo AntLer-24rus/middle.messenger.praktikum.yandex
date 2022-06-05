@@ -1,4 +1,4 @@
-{{#>comp name="Overlay"}}
+<div class="{{classes.overlay}}" style="{{#if isHide}} display: none;{{/if}}">
   {{#>slot name="content"}}
     {{#>comp name="Card" className=@root.classes.user-list}}
       {{#>slot name="title"}}
@@ -8,23 +8,30 @@
         </div>
       {{/slot}}
       {{#>slot name="body"}}
-        {{>comp name="TextField" placeholder="Поиск" className=@root.classes.user-list__search}}
+        {{>comp name="TextField"
+                placeholder="Поиск"
+                value=@root.searchString
+                className=@root.classes.user-list__search
+                $enter=search
+        }}
         <div class="{{@root.classes.user-list__list}}">
           {{#each @root.users as | user |}}
             {{>comp name="UserView"
-                userName=user.name status=user.status
+                userInfo=user
+                currentUserId=@root.currentUserId
                 $removeUser=@root.removeUser
+                $addUser=@root.addUser
             }}
           {{/each}}
         </div>
       {{/slot}}
       {{#>slot name="actions"}}
         {{>comp name="Button"
-            text="Удалить чат" type="stroke"
+            text=(@root.removeChatName) type="stroke"
             className=@root.classes.remove-btn
             $click=@root.removeChat
         }}
       {{/slot}}
     {{/comp}}
   {{/slot}}
-{{/comp}}
+</div>

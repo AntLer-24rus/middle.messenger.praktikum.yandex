@@ -1,5 +1,9 @@
 <div class="{{classes.chats-list}} {{className}}">
-  {{#each chats}}
-    {{>comp name="ChatPreview"}}
+  {{#each chats as |chat|}}
+    {{>comp name="ChatPreview"
+      key=chat.id
+      chatInfo=chat
+      $click=@root.selectChat
+    }}
   {{/each}}
 </div>

@@ -62,6 +62,16 @@
     border-radius: 50%;
     font-size: 64px;
     position: relative;
+    overflow: hidden;
+
+    img {
+      height: inherit;
+      width: inherit;
+      object-fit: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
     &_edit {
       &:hover {

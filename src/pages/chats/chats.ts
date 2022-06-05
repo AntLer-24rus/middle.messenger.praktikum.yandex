@@ -1,14 +1,16 @@
+import { Icon, TextField } from '../../components'
+import { ChatsResponse } from '../../type/api'
+import { defineHBSComponent, HBSComponentInterface } from '../../utils'
 import renderer from './chats.hbs'
 import * as classes from './chats.module.scss'
-import { Component, defineHBSComponent } from '../../utils'
-import { ChatsList } from './components/chats-list'
 import { ChatView } from './components/chat-view'
-import { TextField, Icon } from '../../components'
-import { UserList } from './components/user-list'
+import { ChatsList } from './components/chats-list'
+import { CreateChat } from './components/create-chat'
 import { Profile } from './components/profile'
+import { UserList } from './components/user-list'
 
 type ChatsProps = {
-  chats: { name: number }[]
+  chats: ChatsResponse[]
   messages: {
     isSend: boolean
     type: 'income' | 'send'
@@ -19,77 +21,49 @@ type ChatsProps = {
 
 type ChatsData = {
   classes: typeof classes.default
-  openSetting(this: Component<ChatsData, ChatsProps>, e: Event): void
-  showChatInfoRoot(this: Component<ChatsData, ChatsProps>, e: Event): void
+  currentChat: ChatsResponse | undefined
+  selectChat(this: InstanceType<typeof ChatsList>, id: number): void
+  openSetting(this: InstanceType<typeof Icon>, e: Event): void
+  showChatInfoRoot(this: InstanceType<typeof Icon>, e: Event): void
+  createChat(this: InstanceType<typeof Icon>, e: Event): void
 }
 const props: ChatsProps = {
-  chats: [
-    {
-      name: 1,
-    },
-    {
-      name: 2,
-    },
-    {
-      name: 3,
-    },
-    {
-      name: 4,
-    },
-    {
-      name: 4,
-    },
-    {
-      name: 4,
-    },
-    {
-      name: 4,
-    },
-    {
-      name: 4,
-    },
-    {
-      name: 4,
-    },
-    {
-      name: 4,
-    },
-    {
-      name: 4,
-    },
-  ],
-  messages: [
-    {
-      isSend: false,
-      type: 'income',
-      text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio ipsum, esse ipsam illum aliquid cupiditate voluptates illo tenetur saepe soluta vitae aperiam, debitis dolores natus impedit. Maiores quo sit sequi!',
-      date: new Date('2005-08-09T18:31:42'),
-    },
-    {
-      isSend: true,
-      type: 'send',
-      text: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nulla assumenda magni nobis animi neque impedit eius temporibus, beatae similique minima incidunt distinctio ullam rem necessitatibus odio, fugit qui asperiores soluta architecto. Fuga accusantium totam vel ratione. Perspiciatis quaerat mollitia aspernatur, accusamus ipsa, quibusdam enim maiores laboriosam quia eius facere harum.',
-      date: new Date('2005-08-09T18:33:17'),
-    },
-    {
-      isSend: false,
-      type: 'income',
-      text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio ipsum, esse ipsam illum aliquid cupiditate voluptates illo tenetur saepe soluta vitae aperiam, debitis dolores natus impedit. Maiores quo sit sequi!',
-      date: new Date('2005-08-09T18:38:23'),
-    },
-  ],
+  chats: [],
+  messages: [],
 }
-const emits = {}
+const emits = {
+  showSettings: 'Chats:showSettings',
+  showUserList: 'Chats:showUserList',
+  createChat: 'Chats:createChat',
+}
 
-export default defineHBSComponent({
+export type ChatsPageInstance = HBSComponentInterface<ChatsData, ChatsProps>
+
+export const ChatsPage = defineHBSComponent({
   name: 'Chats',
   renderer,
   emits,
   props,
-  components: [TextField, Icon, ChatsList, ChatView, UserList, Profile],
+  components: [
+    TextField,
+    Icon,
+    ChatsList,
+    ChatView,
+    UserList,
+    Profile,
+    CreateChat,
+  ],
   data(): ChatsData {
     return {
       classes: classes as unknown as typeof classes.default,
+      currentChat: undefined,
+      selectChat(selectedId) {
+        const chats = this.getParentByName('Chats')! as InstanceType<
+          typeof ChatsPage
+        >
+        const currentChat = chats.data.chats.find(({ id }) => id === selectedId)
+        chats.setProps({ currentChat })
+      },
       openSetting(e) {
         e.preventDefault()
         const chats = this.getParentByName('Chats')!
@@ -97,12 +71,24 @@ export default defineHBSComponent({
           'Profile'
         )! as unknown as InstanceType<typeof Profile>
         profile.setProps({ isHide: false })
+        chats.emit(emits.showSettings)
       },
       showChatInfoRoot(e) {
         e.preventDefault()
-        const chats = this.getParentByName('Chats')!
+        const chats = this.getParentByName('Chats') as InstanceType<
+          typeof ChatsPage
+        >
         const userList = chats.getChildrenByName('UserList')!
-        userList.show()
+        userList.setProps({ isHide: false })
+        chats.emit(emits.showUserList, chats.data.currentChat?.id)
+      },
+      createChat(e) {
+        e.preventDefault()
+        e.stopPropagation()
+        const chats = this.getParentByName('Chats') as InstanceType<
+          typeof ChatsPage
+        >
+        chats.emit(emits.createChat)
       },
     }
   },
