@@ -31,6 +31,9 @@ export class EventBus implements EventBusInterface {
     this._listeners[event] = this._listeners[event].filter(
       (listener) => listener !== callback
     )
+    if (this._listeners[event].length === 0) {
+      delete this._listeners[event]
+    }
   }
 
   emit(event: string, ...args: any[]): boolean {
