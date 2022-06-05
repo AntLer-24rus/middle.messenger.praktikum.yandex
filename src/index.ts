@@ -1,14 +1,16 @@
-import { ErrorPage } from './pages'
-import { ChatsPage } from './pages/chats'
-import { LoginPage } from './pages/login'
-import { RegistrationPage } from './pages/registration'
+import {
+  LoginPageController,
+  RegistrationPageController,
+  ChatsPageController,
+  ErrorPageController,
+} from './controllers'
 import { Router } from './utils'
 
 const router = Router.instance()
 
 router
-  .useErrorPage(ErrorPage)
-  .use('/', LoginPage)
-  .use('/signup', RegistrationPage)
-  .use('/chats', ChatsPage)
+  .useErrorPage(ErrorPageController)
+  .use('/', LoginPageController)
+  .use('/signup', RegistrationPageController)
+  .use('/chats', ChatsPageController)
   .start('#app')
