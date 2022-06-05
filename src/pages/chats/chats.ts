@@ -26,6 +26,7 @@ type ChatsData = {
   openSetting(this: InstanceType<typeof Icon>, e: Event): void
   showChatInfoRoot(this: InstanceType<typeof Icon>, e: Event): void
   createChat(this: InstanceType<typeof Icon>, e: Event): void
+  sendMessage(this: InstanceType<typeof ChatView>, message: string): void
 }
 const props: ChatsProps = {
   chats: [],
@@ -35,6 +36,8 @@ const emits = {
   showSettings: 'Chats:showSettings',
   showUserList: 'Chats:showUserList',
   createChat: 'Chats:createChat',
+  selectChat: 'Chats:selectChat',
+  sendMessage: 'Chats:sendMessage',
 }
 
 export type ChatsPageInstance = HBSComponentInterface<ChatsData, ChatsProps>
@@ -58,18 +61,20 @@ export const ChatsPage = defineHBSComponent({
       classes: classes as unknown as typeof classes.default,
       currentChat: undefined,
       selectChat(selectedId) {
-        const chats = this.getParentByName('Chats')! as InstanceType<
+        const chats = this.getParentByName('Chats') as InstanceType<
           typeof ChatsPage
         >
-        const currentChat = chats.data.chats.find(({ id }) => id === selectedId)
-        chats.setProps({ currentChat })
+
+        chats.emit(ChatsPage.emits.selectChat, selectedId)
       },
       openSetting(e) {
         e.preventDefault()
-        const chats = this.getParentByName('Chats')!
+        const chats = this.getParentByName('Chats') as InstanceType<
+          typeof ChatsPage
+        >
         const profile = chats.getChildrenByName(
           'Profile'
-        )! as unknown as InstanceType<typeof Profile>
+        ) as unknown as InstanceType<typeof Profile>
         profile.setProps({ isHide: false })
         chats.emit(emits.showSettings)
       },
@@ -78,7 +83,9 @@ export const ChatsPage = defineHBSComponent({
         const chats = this.getParentByName('Chats') as InstanceType<
           typeof ChatsPage
         >
-        const userList = chats.getChildrenByName('UserList')!
+        const userList = chats.getChildrenByName('UserList') as InstanceType<
+          typeof UserList
+        >
         userList.setProps({ isHide: false })
         chats.emit(emits.showUserList, chats.data.currentChat?.id)
       },
@@ -89,6 +96,12 @@ export const ChatsPage = defineHBSComponent({
           typeof ChatsPage
         >
         chats.emit(emits.createChat)
+      },
+      sendMessage(message) {
+        const chats = this.getParentByName('Chats') as InstanceType<
+          typeof ChatsPage
+        >
+        chats.emit(emits.sendMessage, message)
       },
     }
   },
