@@ -1,6 +1,7 @@
 import {
   BadRequestError,
   ChatDeleteResponse,
+  ChatsMessagesTokenResponse,
   ChatsResponse,
   ChatUserResponse,
 } from '../type/api'
@@ -14,6 +15,7 @@ export class ChatsService extends HTTPService {
     addUsers: 'addUsers:emits',
     deleteUsers: 'deleteUsers:emits',
     userList: 'userList:emits',
+    token: 'token:emits',
   }
 
   static listening = {
@@ -23,6 +25,7 @@ export class ChatsService extends HTTPService {
     addUsers: 'addUsers:listening',
     deleteUsers: 'deleteUsers:listening',
     userList: 'userList:listening',
+    token: 'token:listening',
   }
 
   constructor() {
@@ -39,6 +42,7 @@ export class ChatsService extends HTTPService {
     )
     connect(this, ChatsService.listening.userList, this, this.getUserList)
     connect(this, ChatsService.listening.removeChat, this, this.removeChat)
+    connect(this, ChatsService.listening.token, this, this.getToken)
   }
 
   getChats(param?: { offset: number; limit: number; title?: string }): void {
@@ -54,12 +58,12 @@ export class ChatsService extends HTTPService {
 
   createChat(title: string) {
     this.transport
-      .post<undefined | BadRequestError>('/', { param: { title } })
+      .post<{ id: number } | BadRequestError>('/', { param: { title } })
       .then(({ status, data, statusText }) => {
-        if (data) {
+        if ('reason' in data) {
           throw new Error(`${status} - ${statusText} (${data.reason})`)
         }
-        this.emit(ChatsService.emits.createChat)
+        this.emit(ChatsService.emits.createChat, data.id)
       })
   }
 
@@ -90,9 +94,9 @@ export class ChatsService extends HTTPService {
 
   addUsersToChat(users: number[], chatId: number) {
     this.transport
-      .put<undefined | BadRequestError>('/users', { param: { users, chatId } })
+      .put<string | BadRequestError>('/users', { param: { users, chatId } })
       .then(({ status, data, statusText }) => {
-        if (data) {
+        if (typeof data !== 'string') {
           throw new Error(`${status} - ${statusText} (${data.reason})`)
         }
         this.emit(ChatsService.emits.addUsers, users)
@@ -109,6 +113,17 @@ export class ChatsService extends HTTPService {
           throw new Error(`${status} - ${statusText} (${data?.reason})`)
         }
         this.emit(ChatsService.emits.deleteUsers, users)
+      })
+  }
+
+  getToken(chatId: number) {
+    this.transport
+      .post<ChatsMessagesTokenResponse | undefined>(`/token/${chatId}`)
+      .then(({ status, data, statusText }) => {
+        if (!data) {
+          throw new Error(`${status} - ${statusText}`)
+        }
+        this.emit(ChatsService.emits.token, chatId, data.token)
       })
   }
 }
