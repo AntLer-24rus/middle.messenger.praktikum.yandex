@@ -1,26 +1,23 @@
-import type { Component, ExtendComponentConstructor } from './Component'
-
-function isEqual(strA: string, strB: string): boolean {
-  return strA === strB
-}
+import { Controller, ExtendControllerConstructor } from './Controller'
+import { isEqual } from './isEqual'
 
 export class Route {
   private _pathname: string
 
-  private _blockClass: ExtendComponentConstructor
+  private _ComponentController: ExtendControllerConstructor
 
-  private _block: Component | null
+  private _controller: Controller | null
 
-  private _props: any
+  private _props: any // eslint-disable-line @typescript-eslint/no-explicit-any
 
   constructor(
     pathname: string,
-    view: ExtendComponentConstructor,
+    ControllerConstructor: ExtendControllerConstructor,
     props: unknown
   ) {
     this._pathname = pathname
-    this._blockClass = view
-    this._block = null
+    this._controller = null
+    this._ComponentController = ControllerConstructor
     this._props = props
   }
 
@@ -32,8 +29,8 @@ export class Route {
   // }
 
   leave() {
-    if (this._block) {
-      this._block.hide()
+    if (this._controller) {
+      this._controller.emit(Controller.listening.hide)
     }
   }
 
@@ -46,11 +43,11 @@ export class Route {
   }
 
   render(selector: string) {
-    if (!this._block) {
-      this._block = new this._blockClass({ props: this._props })
+    if (!this._controller) {
+      this._controller = new this._ComponentController(this._props)
     }
-    this._block.mount(selector)
 
-    this._block.show()
+    this._controller.emit(Controller.listening.mount, selector)
+    this._controller.emit(Controller.listening.show)
   }
 }

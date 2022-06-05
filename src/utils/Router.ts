@@ -1,5 +1,8 @@
-/* eslint no-use-before-define: "off", no-underscore-dangle: ["error", { "allowAfterThis": true, "allow": ["_instance"] }] */
-import type { ExtendComponentConstructor } from './Component'
+/* eslint
+    no-use-before-define: off,
+    no-underscore-dangle: ["error", { "allowAfterThis": true, "allow": ["_instance"] }]
+*/
+import { ExtendControllerConstructor } from './Controller'
 import { Route } from './Route'
 
 export class Router {
@@ -11,7 +14,7 @@ export class Router {
 
   private _currentRoute: Route | undefined
 
-  private _rootQuery: any
+  private _rootQuery = ''
 
   private _errorRoute: Route | undefined
 
@@ -27,23 +30,27 @@ export class Router {
     return Router._instance
   }
 
-  use(pathname: string, page: ExtendComponentConstructor) {
-    const route = new Route(pathname, page, { rootQuery: this._rootQuery })
+  use(pathname: string, pageController: ExtendControllerConstructor) {
+    const route = new Route(pathname, pageController, {
+      rootQuery: this._rootQuery,
+    })
     this.routes.push(route)
     return this
   }
 
-  useErrorPage(page: ExtendComponentConstructor) {
-    this._errorRoute = new Route('/error', page, { rootQuery: this._rootQuery })
+  useErrorPage(pageController: ExtendControllerConstructor) {
+    this._errorRoute = new Route('/error', pageController, {
+      rootQuery: this._rootQuery,
+    })
     return this
   }
 
   start(rootSelector: string) {
     this._rootQuery = rootSelector
     window.onpopstate = (event) => {
-      console.log('event :>> ', event)
-      // @ts-ignore
-      this._onRoute(event.currentTarget.location.pathname)
+      if (event.currentTarget instanceof Window) {
+        this._onRoute(event.currentTarget.location.pathname)
+      }
     }
 
     this._onRoute(window.location.pathname)
@@ -53,7 +60,10 @@ export class Router {
     let route: Route | undefined = this.getRoute(pathname)
 
     if (!route) {
-      route = this._errorRoute!
+      route = this._errorRoute
+      if (!route) {
+        throw new Error('Error page undefined')
+      }
       route.setProps({
         code: '404',
         textError: 'Кажется такой страницы нет...',
@@ -68,7 +78,13 @@ export class Router {
     try {
       route.render(this._rootQuery)
     } catch (error) {
-      route = this._errorRoute!
+      if (process.env.NODE_ENV === 'development') {
+        console.error(error)
+      }
+      route = this._errorRoute
+      if (!route) {
+        throw new Error('Error page undefined')
+      }
       this._currentRoute = route
       route.setProps({
         code: '500',
