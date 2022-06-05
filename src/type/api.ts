@@ -73,3 +73,15 @@ export type Resource = {
   upload_size: number
   upload_date: string
 }
+
+export type ChatsMessagesTokenResponse = {
+  token: string
+}
+
+export type InstantMessage = {
+  id: string
+  time: string
+  user_id: string
+  content: string
+  type: 'message'
+}
