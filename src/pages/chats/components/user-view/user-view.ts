@@ -43,7 +43,6 @@ const UserView = defineHBSComponent({
   emits,
   props,
   data(): UserViewData {
-    console.log('this.currentUserId :>> ', this.currentUserId)
     return {
       classes: classes as unknown as typeof classes.default,
       isAdmin: this.userInfo.role === 'admin',
