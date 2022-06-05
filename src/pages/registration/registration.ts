@@ -1,14 +1,12 @@
-import renderer from './registration.hbs'
-import * as classes from './registration.module.scss'
-
+import { Button, Card, TextField } from '../../components'
 import {
   collectFieldValues,
-  Component,
   defineHBSComponent,
-  Router,
+  HBSComponentInterface,
   validator,
 } from '../../utils'
-import { Button, TextField, Card } from '../../components'
+import renderer from './registration.hbs'
+import * as classes from './registration.module.scss'
 
 type RegistrationPageProps = Record<string, never>
 
@@ -29,7 +27,15 @@ type RegistrationPageData = {
 }
 
 const props: RegistrationPageProps = {}
-const emits = {}
+const emits = {
+  signIn: 'RegistrationPage:signin',
+  signUp: 'RegistrationPage:signUp',
+}
+
+export type RegistrationPageInstance = HBSComponentInterface<
+  RegistrationPageData,
+  RegistrationPageProps
+>
 
 export default defineHBSComponent({
   name: 'RegistrationPage',
@@ -98,15 +104,16 @@ export default defineHBSComponent({
           click(e) {
             e.preventDefault()
             e.stopPropagation()
+
             const registrationPage = this.getParentByName('RegistrationPage')!
             const card = registrationPage.getChildrenByName('Card')!
-            const children =
-              card.children as unknown as ReadonlyArray<Component>
-            const isTextField = (c: InstanceType<typeof TextField>) =>
-              c.name === 'TextField'
-            const textFields = children.filter(isTextField)
+            const textFields = card.children.filter(
+              ({ name }) => name === 'TextField'
+            )
             const formData = collectFieldValues(textFields)
-            global.console.log('registration data :>> ', formData)
+            if (formData.valid) {
+              registrationPage.emit(emits.signUp, formData.data)
+            }
           },
         },
         {
@@ -115,7 +122,9 @@ export default defineHBSComponent({
           click(e: Event) {
             e.preventDefault()
             e.stopPropagation()
-            Router.instance().go('/')
+
+            const registrationPage = this.getParentByName('RegistrationPage')!
+            registrationPage.emit(emits.signIn)
           },
         },
       ],
