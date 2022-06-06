@@ -12,7 +12,7 @@ export abstract class WSService extends Service {
     this.socket.addEventListener('message', this._message.bind(this))
   }
 
-  private _error(event: Event) {
+  private _error() {
     this.error({ code: -1, reason: 'Unknown reason' })
   }
 
