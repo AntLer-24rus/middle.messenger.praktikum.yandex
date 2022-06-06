@@ -54,3 +54,4 @@ npm run test
 
 - Первый спринт [sprint_1](https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex/pull/1)
 - Второй спринт [sprint_2](https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex/pull/2)
+- Третий спринт [sprint_3](https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex/pull/3)
