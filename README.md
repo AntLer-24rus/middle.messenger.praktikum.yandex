@@ -42,9 +42,16 @@ npm run dev
 npm run clean
 ```
 
+Запуск тестов осуществляется командой:
+
+```bash
+npm run test
+```
+
 Текущая версия доступна на [netlify](https://ubiquitous-entremet-7f80bf.netlify.app)
 
 ## Pull requests
 
-Первый спринт [sprint_1](https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex/pull/1)
-Второй спринт [sprint_2](https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex/pull/2)
+- Первый спринт [sprint_1](https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex/pull/1)
+- Второй спринт [sprint_2](https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex/pull/2)
+- Третий спринт [sprint_3](https://github.com/AntLer-24rus/middle.messenger.praktikum.yandex/pull/3)
