@@ -1,18 +1,29 @@
 <div class="{{classes.user-view}}">
   <div class="{{classes.user-view__avatar}}">
-    {{avatar}}
+    {{#if avatar}}
+      <img src="{{avatar}}" alt="{{avatarAlt}}">
+    {{else}}
+      {{avatarAlt}}
+    {{/if}}
   </div>
   <div class="{{classes.user-view__info}} {{classes.info}}">
     <div class="{{classes.info__user-name}}">
-      {{userName}}
+      {{#if userInfo.display_name}}
+        {{userInfo.display_name}}
+      {{else}}
+        {{userInfo.first_name}} {{userInfo.second_name}}
+      {{/if}}
     </div>
     <div class="{{classes.info__user-status}}">
-      {{status}}
+        {{#if isCurrentUser}} <span>Вы</span> {{/if}} 
+        {{#if isAdmin}} <span>Админ</span> {{/if}} 
     </div>
   </div>
-  {{>comp name="Icon" 
-      iconName="trash"
-      className=classes.user-view__remove-icon
-      $click=removeUser
-  }}
+  {{#if isInteract}}
+    {{>comp name="Icon" 
+        iconName=(interactIcon)
+        className=(interactClass)
+        $click=interactUser
+    }}
+  {{/if}}
 </div>

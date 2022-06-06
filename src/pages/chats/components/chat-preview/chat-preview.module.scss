@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import '../../../../utils/variables';
 
 .chat-preview {
@@ -8,7 +9,15 @@
   display: flex;
 
   &:hover {
-    background-color: $color-primary-light;
+    background-color: $color-primary-extra-light;
+  }
+
+  &_selected {
+    background-color: $color-primary;
+
+    &:hover {
+      background-color: color.adjust($color-primary, $lightness: 13%);
+    }
   }
 
   &__avatar {

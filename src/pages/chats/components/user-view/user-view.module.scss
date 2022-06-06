@@ -1,4 +1,5 @@
 @import '../../../../utils/variables';
+@import '../../../../utils/mixins';
 
 .user-view {
   display: flex;
@@ -14,6 +15,7 @@
 
   &__avatar {
     width: 80px;
+    min-width: 80px;
     height: 80px;
     font-size: $extra-large-text;
     background: $color-gray;
@@ -22,17 +24,34 @@
     justify-content: center;
     align-items: center;
     margin-right: 10px;
+    overflow: hidden;
+
+    img {
+      height: inherit;
+      width: inherit;
+      object-fit: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
   &__info {
+    @include scrollable;
+
     flex-grow: 1;
+    overflow: auto;
+  }
+
+  &__add-icon {
+    svg:hover {
+      stroke: $color-primary;
+    }
   }
 
   &__remove-icon {
-    svg {
-      &:hover {
-        stroke: $color-error;
-      }
+    svg:hover {
+      stroke: $color-error;
     }
   }
 }

@@ -1,0 +1,37 @@
+<div class="{{classes.overlay}}" style="{{#if isHide}} display: none;{{/if}}">
+  {{#>comp name="Card" title="Смена пароля" className=@root.classes.card}}
+    {{#>slot name="body"}}
+      <div class="{{@root.classes.card__body-wrapper}}">
+        {{>comp name="TextField"
+            inputName="oldPassword"
+            label="Старый пароль"
+            value=@root.oldPassword
+            validate=@root.oldPasswordValidator
+            placeholder="Введите старый пароль"
+            className=@root.classes.card__input
+        }}
+        {{>comp name="TextField"
+            inputName="newPassword"
+            label="Новый пароль"
+            value=@root.newPassword
+            validate=@root.newPasswordValidator
+            placeholder="Введите новый пароль"
+            className=@root.classes.card__input
+        }}
+      </div>
+    {{/slot}}
+    {{#>slot name="actions"}}
+      <div class="{{@root.classes.card__action-wrapper}}">
+        {{>comp name="Button" 
+              type="fill"
+              text="Сменить"
+              $click=@root.changePassword
+        }}
+        {{>comp name="Button" 
+              text="Отмена"
+              $click=@root.cancel
+        }}
+      </div>
+    {{/slot}}
+  {{/comp}}
+</div>

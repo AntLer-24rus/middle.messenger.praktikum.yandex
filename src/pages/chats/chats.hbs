@@ -2,25 +2,35 @@
   <div class="{{classes.chats-preview}}">
     <div class="{{classes.chats-preview__header}}">
       {{>comp name="Icon" iconName="setting" $click=openSetting}}
+      {{>comp name="Icon" iconName="plus" $click=createChat}}
       {{>comp
         name="TextField"
         className=classes.search-field
         placeholder="Поиск"
       }}
+      
     </div>
     {{>comp
       name="ChatList"
       className=classes.chats-preview__chats-list
       chats=chats
+      $select=selectChat
     }}
   </div>
-  {{>comp
-    name="ChatView"
-    className=classes.chat-view
-    chatName="Chat 1"
-    messages=messages
-    $showChatInfo=showChatInfoRoot
-  }}
+  {{#if currentChat}}
+    {{>comp name="ChatView"
+        className=classes.chat-view
+        chatName=currentChat.title
+        messages=messages
+        $showChatInfo=showChatInfoRoot
+        $sendMessage=sendMessage
+    }}
+  {{else}}
+    <div class="{{classes.empty-chat-view}} {{classes.chat-view}}">
+      Выберите или создайте чат...
+    </div>
+  {{/if}}
   {{>comp name="UserList"}}
   {{>comp name="Profile"}}
+  {{>comp name="CreateChat"}}
 </div>

@@ -1,31 +1,93 @@
+import { ChatUserResponse } from '../../../../type/api'
+import { Component, defineHBSComponent } from '../../../../utils'
 import renderer from './user-view.hbs'
 import * as classes from './user-view.module.scss'
-import { Component, defineHBSComponent } from '../../../../utils'
 
 type UserViewProps = {
-  classes: typeof classes
-  userName: string
-  status: string
+  userInfo: ChatUserResponse[number]
+  currentUserId: number
 }
 
 type UserViewData = {
-  avatar: string
-  removeUser: (this: Component) => void
+  classes: typeof classes.default
+  isAdmin: boolean
+  isCurrentUser: boolean
+  isInteract: boolean
+  avatar(this: UserViewData & UserViewProps): string | null
+  avatarAlt: (this: UserViewData & UserViewProps) => string
+  interactUser: (this: Component) => void
+  interactIcon: (this: UserViewProps & UserViewData) => string
+  interactClass: (this: UserViewProps & UserViewData) => string
 }
-
-export default defineHBSComponent<UserViewData, UserViewProps>({
+const props: UserViewProps = {
+  currentUserId: 1,
+  userInfo: {
+    avatar: null,
+    display_name: null,
+    email: '',
+    first_name: '',
+    id: 1,
+    login: '',
+    phone: '',
+    role: '',
+    second_name: '',
+  },
+}
+const emits = {
+  removeUser: 'UserView:removeUser',
+  addUser: 'UserView:addUser',
+}
+const UserView = defineHBSComponent({
   name: 'UserView',
   renderer,
-  props: { classes, userName: 'Default user name', status: 'offline' },
-  data(this: UserViewProps) {
+  emits,
+  props,
+  data(): UserViewData {
     return {
-      avatar: this.userName
-        .split(' ')
-        .map((i) => i[0])
-        .join(''),
-      removeUser() {
-        this.parent!.emit('UserView:removeUser', this.id)
+      classes: classes as unknown as typeof classes.default,
+      isAdmin: this.userInfo.role === 'admin',
+      isCurrentUser: this.userInfo.id === this.currentUserId,
+      isInteract:
+        this.userInfo.role !== 'admin' &&
+        this.userInfo.id !== this.currentUserId,
+      avatar() {
+        return this.userInfo.avatar
+          ? `https://ya-praktikum.tech/api/v2/resources${this.userInfo.avatar}`
+          : this.userInfo.avatar
+      },
+      avatarAlt() {
+        /* eslint-disable camelcase */
+        const { display_name, first_name, second_name } = this.userInfo
+        return display_name
+          ? display_name
+              .split(' ')
+              .map((word) => word[0])
+              .slice(0, 2)
+              .join('')
+          : `${first_name[0]}${second_name[0]}`
+        /* eslint-enable camelcase */
+      },
+      interactUser() {
+        const userView = this.getParentByName('UserView')! as InstanceType<
+          typeof UserView
+        >
+
+        if (userView.data.userInfo.role === 'external') {
+          userView.emit(emits.addUser, userView.data.userInfo.id)
+        } else {
+          userView.emit(emits.removeUser, userView.data.userInfo.id)
+        }
+      },
+      interactIcon() {
+        return this.userInfo.role === 'external' ? 'plus' : 'trash'
+      },
+      interactClass() {
+        return this.userInfo.role === 'external'
+          ? this.classes['user-view__add-icon']
+          : this.classes['user-view__remove-icon']
       },
     }
   },
 })
+
+export default UserView

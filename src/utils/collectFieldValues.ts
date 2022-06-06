@@ -13,7 +13,14 @@ export function collectFieldValues(textFields: TextFieldComp[]): FormData {
     errors: {},
   }
   textFields.forEach((tf) => {
-    const { inputName, value, validateInput } = tf.data
+    let { value } = tf.data
+    const { inputName, validateInput } = tf.data
+
+    if (!value) {
+      const input = tf.getChildrenByName('Input')?.element as HTMLInputElement
+      value = input.value
+      tf.setProps({ value })
+    }
     const error = validateInput.call(tf)
     data.data[inputName] = value
     if (error) {
