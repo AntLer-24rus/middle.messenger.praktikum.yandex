@@ -8,9 +8,9 @@ import { Route } from './Route'
 export class Router {
   private static _instance: Router | null = null
 
-  routes: Route[]
+  private _routes: Route[]
 
-  history: History
+  private _history: History
 
   private _currentRoute: Route | undefined
 
@@ -19,8 +19,8 @@ export class Router {
   private _errorRoute: Route | undefined
 
   private constructor() {
-    this.routes = []
-    this.history = window.history
+    this._routes = []
+    this._history = window.history
   }
 
   static instance(): Router {
@@ -34,7 +34,7 @@ export class Router {
     const route = new Route(pathname, pageController, {
       rootQuery: this._rootQuery,
     })
-    this.routes.push(route)
+    this._routes.push(route)
     return this
   }
 
@@ -47,13 +47,24 @@ export class Router {
 
   start(rootSelector: string) {
     this._rootQuery = rootSelector
-    window.onpopstate = (event) => {
-      if (event.currentTarget instanceof Window) {
-        this._onRoute(event.currentTarget.location.pathname)
-      }
+    window.onpopstate = () => {
+      this._onRoute(window.location.pathname)
     }
 
     this._onRoute(window.location.pathname)
+  }
+
+  go(pathname: string) {
+    this._history.pushState({}, '', pathname)
+    this._onRoute(pathname)
+  }
+
+  back() {
+    this._history.back()
+  }
+
+  forward() {
+    this._history.forward()
   }
 
   private _onRoute(pathname: string) {
@@ -62,7 +73,7 @@ export class Router {
     if (!route) {
       route = this._errorRoute
       if (!route) {
-        throw new Error('Error page undefined')
+        throw new Error('Error page undefined 400')
       }
       route.setProps({
         code: '404',
@@ -83,7 +94,11 @@ export class Router {
       }
       route = this._errorRoute
       if (!route) {
-        throw new Error('Error page undefined')
+        let errorDescribe = 'Undefined'
+        if (error instanceof Error) {
+          errorDescribe = error.message
+        }
+        throw new Error(`Error page undefined 500 - ${errorDescribe}`)
       }
       this._currentRoute = route
       route.setProps({
@@ -94,20 +109,7 @@ export class Router {
     }
   }
 
-  go(pathname: string) {
-    this.history.pushState({}, '', pathname)
-    this._onRoute(pathname)
-  }
-
-  back() {
-    this.history.back()
-  }
-
-  forward() {
-    this.history.forward()
-  }
-
-  getRoute(pathname: string) {
-    return this.routes.find((route) => route.match(pathname))
+  private getRoute(pathname: string) {
+    return this._routes.find((route) => route.match(pathname))
   }
 }

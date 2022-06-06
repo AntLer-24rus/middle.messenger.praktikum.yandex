@@ -55,7 +55,7 @@ export class HTTPTransport implements HTTPTransportInterface {
 
   get<ResponseType = unknown>(
     pathname = '',
-    options = {} as HTTPTransportOptionsWithoutMethod
+    options: HTTPTransportOptionsWithoutMethod = {}
   ) {
     if (pathname && !/^\/[^?]*$/gm.test(pathname)) {
       throw new Error('Неправильно использован параметр pathname')
@@ -69,7 +69,10 @@ export class HTTPTransport implements HTTPTransportInterface {
     )
   }
 
-  put<ResponseType = unknown>(pathname = '', options = {}) {
+  put<ResponseType = unknown>(
+    pathname = '',
+    options: HTTPTransportOptionsWithoutMethod = {}
+  ) {
     if (pathname && !/^\/[^?]*$/gm.test(pathname))
       throw new Error('Неправильно использован параметр pathname')
     return this._request<ResponseType>(pathname, {
@@ -78,7 +81,10 @@ export class HTTPTransport implements HTTPTransportInterface {
     })
   }
 
-  patch<ResponseType = unknown>(pathname = '', options = {}) {
+  patch<ResponseType = unknown>(
+    pathname = '',
+    options: HTTPTransportOptionsWithoutMethod = {}
+  ) {
     if (pathname && !/^\/[^?]*$/gm.test(pathname))
       throw new Error('Неправильно использован параметр pathname')
 
@@ -88,7 +94,10 @@ export class HTTPTransport implements HTTPTransportInterface {
     })
   }
 
-  post<ResponseType = unknown>(pathname = '', options = {}) {
+  post<ResponseType = unknown>(
+    pathname = '',
+    options: HTTPTransportOptionsWithoutMethod = {}
+  ) {
     if (pathname && !/^\/[^?]*$/gm.test(pathname))
       throw new Error('Неправильно использован параметр pathname')
     return this._request<ResponseType>(pathname, {

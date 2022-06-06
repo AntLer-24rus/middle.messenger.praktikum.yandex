@@ -93,11 +93,7 @@ export abstract class Component<
   }: ComponentOptions<DataType, PropsType>) {
     super()
     this._meta = { name, id: uuid() }
-    // this._parent = parent
-
-    // this._prepareData(data, props)
-
-    const prepData = { ...data?.call(props), ...props }
+    const prepData = { ...data.call(props), ...props }
     this.data = new Proxy(prepData, {
       set: (target: any, prop, value) => {
         if (Object.prototype.hasOwnProperty.call(target, prop)) {
