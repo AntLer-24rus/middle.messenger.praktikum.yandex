@@ -46,7 +46,7 @@ export class RealTimeMessageService extends WSService {
     this.emit(RealTimeMessageService.emits.close, code, reason)
   }
 
-  protected error(description): void {
+  protected error(description: { code: number; reason: string }): void {
     console.log('RealTimeMessageService -> Error', description)
     this.emit(RealTimeMessageService.emits.error)
   }
