@@ -47,9 +47,9 @@ export class ChatsService extends HTTPService {
 
   getChats(param?: { offset: number; limit: number; title?: string }): void {
     this.transport
-      .get<ChatsResponse | undefined>('/', { param })
+      .get<ChatsResponse | string>('/', { param })
       .then(({ status, data, statusText }) => {
-        if (!data) {
+        if (status >= 400) {
           throw new Error(`${status} - ${statusText}`)
         }
         this.emit(ChatsService.emits.updateChats, data)
@@ -71,10 +71,13 @@ export class ChatsService extends HTTPService {
     this.transport
       .delete<ChatDeleteResponse | undefined>('/', { param: { chatId } })
       .then(({ status, data, statusText }) => {
-        if (!data) {
+        if (status >= 400) {
           throw new Error(`${status} - ${statusText}`)
         }
-        this.emit(ChatsService.emits.removeChat, data.result.id)
+        this.emit(
+          ChatsService.emits.removeChat,
+          (data as ChatDeleteResponse).result.id
+        )
       })
   }
 
@@ -85,7 +88,7 @@ export class ChatsService extends HTTPService {
     this.transport
       .get<ChatUserResponse | undefined>(`/${id}/users`, { param })
       .then(({ status, data, statusText }) => {
-        if (!data) {
+        if (status >= 400) {
           throw new Error(`${status} - ${statusText}`)
         }
         this.emit(ChatsService.emits.userList, id, data)
@@ -120,10 +123,14 @@ export class ChatsService extends HTTPService {
     this.transport
       .post<ChatsMessagesTokenResponse | undefined>(`/token/${chatId}`)
       .then(({ status, data, statusText }) => {
-        if (!data) {
+        if (status >= 400) {
           throw new Error(`${status} - ${statusText}`)
         }
-        this.emit(ChatsService.emits.token, chatId, data.token)
+        this.emit(
+          ChatsService.emits.token,
+          chatId,
+          (data as ChatsMessagesTokenResponse).token
+        )
       })
   }
 }

@@ -71,8 +71,10 @@ export class UsersService extends HTTPService {
     this.transport
       .put<undefined | BadRequestError>('/password', { param: passwords })
       .then(({ status, data, statusText }) => {
-        if (data) {
-          throw new Error(`${status} - ${statusText} (${data.reason})`)
+        if (status >= 400) {
+          throw new Error(
+            `${status} - ${statusText} (${(data as BadRequestError).reason})`
+          )
         }
         this.emit(UsersService.emits.updatePassword)
       })
@@ -82,7 +84,7 @@ export class UsersService extends HTTPService {
     this.transport
       .get<UserResponse | undefined>(`/${id}`)
       .then(({ status, data, statusText }) => {
-        if (!data) {
+        if (status >= 400) {
           throw new Error(`${status} - ${statusText}`)
         }
         this.emit(UsersService.emits.findUser, data)

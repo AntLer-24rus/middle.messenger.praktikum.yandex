@@ -43,9 +43,9 @@ export class AuthService extends HTTPService {
 
   signin(authData: SignInRequest): void {
     this.transport
-      .post<undefined | BadRequestError>('/signin', { param: authData })
+      .post<string | BadRequestError>('/signin', { param: authData })
       .then(({ status, data, statusText }) => {
-        if (data) {
+        if (typeof data !== 'string' && status >= 400) {
           throw new Error(`${status} - ${statusText} (${data.reason})`)
         }
         this.emit(AuthService.emits.signIn)
@@ -67,7 +67,7 @@ export class AuthService extends HTTPService {
 
   logout() {
     this.transport
-      .post<undefined>('/logout')
+      .post<string>('/logout')
       .then(({ status, data, statusText }) => {
         if (status >= 400) {
           throw new Error(`${status} - ${statusText}`)
