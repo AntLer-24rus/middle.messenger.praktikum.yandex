@@ -16,9 +16,9 @@
       {{chatInfo.title}}
     </div>
     {{#if chatInfo.last_message}}
-      <div class="{{classes.info__time}}">
+      <time class="{{classes.info__time}}">
         {{lastMessageTime}}
-      </div>
+      </time>
       <div class="{{classes.info__last-msg}}">
         {{chatInfo.last_message.content}}
       </div>

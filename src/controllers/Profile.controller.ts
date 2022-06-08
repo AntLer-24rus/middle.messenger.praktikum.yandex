@@ -147,10 +147,6 @@ export class ProfileController extends Controller<ProfileInstance> {
 
   private _changeCurrentUserAvatar() {
     const tmpInput = document.createElement('input')
-    // const canvas = document.createElement('canvas')
-    // const ctx = canvas.getContext('2d')
-
-    // ctx?.drawImage()
 
     tmpInput.type = 'file'
     tmpInput.multiple = false

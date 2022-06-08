@@ -41,6 +41,8 @@ function formateDate(timestamp: string): string {
   return `${day}.${month} ${hours}:${minutes}:${seconds}`
 }
 
+const FIRST_LETTER = 0
+
 export default defineHBSComponent({
   name: 'ChatPreview',
   renderer,
@@ -52,7 +54,7 @@ export default defineHBSComponent({
       hasUnread: this.chatInfo.unread_count > 0,
       avatarAlt: this.chatInfo.title
         .split(' ')
-        .map((word) => word[0].toUpperCase())
+        .map((word) => word[FIRST_LETTER].toUpperCase())
         .slice(0, 2)
         .join(''),
       lastMessageTime: this.chatInfo.last_message
