@@ -1,4 +1,6 @@
-// eslint-disable-next-line no-shadow
+import { getType } from './getType'
+import { queryStringify } from './queryStringify'
+
 enum METHODS {
   GET = 'GET',
   POST = 'POST',
@@ -9,109 +11,163 @@ enum METHODS {
 
 type HTTPTransportOptions = {
   method: METHODS
-  param?: any
+  param?: any // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 type HTTPTransportOptionsWithoutMethod = Omit<HTTPTransportOptions, 'method'>
 
-type HTTPTransportResponse = {
+type HTTPTransportResponse<ResponseType = unknown> = {
   headers: Record<string, string>
   status: number
   statusText: string
-  data: any
+  data: ResponseType
 }
 
-type HTTPTransportMethodSignature = (
-  pathname?: string,
-  options?: HTTPTransportOptionsWithoutMethod
-) => Promise<HTTPTransportResponse>
+interface HTTPTransportInterface {
+  get<ResponseType = unknown>(
+    pathname?: string,
+    options?: HTTPTransportOptionsWithoutMethod
+  ): Promise<HTTPTransportResponse<ResponseType>>
+  put<ResponseType = unknown>(
+    pathname?: string,
+    options?: HTTPTransportOptionsWithoutMethod
+  ): Promise<HTTPTransportResponse<ResponseType>>
+  patch<ResponseType = unknown>(
+    pathname?: string,
+    options?: HTTPTransportOptionsWithoutMethod
+  ): Promise<HTTPTransportResponse<ResponseType>>
+  post<ResponseType = unknown>(
+    pathname?: string,
+    options?: HTTPTransportOptionsWithoutMethod
+  ): Promise<HTTPTransportResponse<ResponseType>>
+  delete<ResponseType = unknown>(
+    pathname?: string,
+    options?: HTTPTransportOptionsWithoutMethod
+  ): Promise<HTTPTransportResponse<ResponseType>>
+}
 
-export class HTTPTransport {
+export class HTTPTransport implements HTTPTransportInterface {
   private _baseUrl: string
 
   constructor(baseUrl: string = window.location.origin) {
-    this._baseUrl = baseUrl
+    this._baseUrl = baseUrl.replace(/\/$/, '')
   }
 
-  get: HTTPTransportMethodSignature = (pathname = '', options = {}) => {
+  get<ResponseType = unknown>(
+    pathname = '',
+    options: HTTPTransportOptionsWithoutMethod = {}
+  ) {
+    if (pathname && !/^\/[^?]*$/gm.test(pathname)) {
+      throw new Error('Неправильно использован параметр pathname')
+    }
+    return this._request<ResponseType>(
+      options.param ? `${pathname}?${queryStringify(options.param)}` : pathname,
+      {
+        ...options,
+        method: METHODS.GET,
+      }
+    )
+  }
+
+  put<ResponseType = unknown>(
+    pathname = '',
+    options: HTTPTransportOptionsWithoutMethod = {}
+  ) {
     if (pathname && !/^\/[^?]*$/gm.test(pathname))
       throw new Error('Неправильно использован параметр pathname')
-    return this.request(pathname, {
+    return this._request<ResponseType>(pathname, {
       ...options,
-      method: METHODS.GET,
+      method: METHODS.PUT,
     })
   }
 
-  put: HTTPTransportMethodSignature = (pathname = '', options = {}) => {
+  patch<ResponseType = unknown>(
+    pathname = '',
+    options: HTTPTransportOptionsWithoutMethod = {}
+  ) {
     if (pathname && !/^\/[^?]*$/gm.test(pathname))
       throw new Error('Неправильно использован параметр pathname')
-    return this.request(pathname, { ...options, method: METHODS.PUT })
+
+    return this._request<ResponseType>(pathname, {
+      ...options,
+      method: METHODS.PATCH,
+    })
   }
 
-  patch: HTTPTransportMethodSignature = (pathname = '', options = {}) => {
+  post<ResponseType = unknown>(
+    pathname = '',
+    options: HTTPTransportOptionsWithoutMethod = {}
+  ) {
     if (pathname && !/^\/[^?]*$/gm.test(pathname))
       throw new Error('Неправильно использован параметр pathname')
-    return this.request(pathname, { ...options, method: METHODS.PATCH })
+    return this._request<ResponseType>(pathname, {
+      ...options,
+      method: METHODS.POST,
+    })
   }
 
-  post: HTTPTransportMethodSignature = (pathname = '', options = {}) => {
+  delete<ResponseType>(pathname = '', options = {}) {
     if (pathname && !/^\/[^?]*$/gm.test(pathname))
       throw new Error('Неправильно использован параметр pathname')
-    return this.request(pathname, { ...options, method: METHODS.POST })
+    return this._request<ResponseType>(pathname, {
+      ...options,
+      method: METHODS.DELETE,
+    })
   }
 
-  delete: HTTPTransportMethodSignature = (pathname = '', options = {}) => {
-    if (pathname && !/^\/[^?]*$/gm.test(pathname))
-      throw new Error('Неправильно использован параметр pathname')
-    return this.request(pathname, { ...options, method: METHODS.DELETE })
-  }
-
-  request(
+  private _request<ResponseType>(
     url: string,
     options: HTTPTransportOptions = { method: METHODS.GET }
   ) {
     const { method, param } = options
 
-    return new Promise<HTTPTransportResponse>((resolve, reject) => {
-      const xhr = new XMLHttpRequest()
-      xhr.open(method, new URL(url, this._baseUrl))
+    return new Promise<HTTPTransportResponse<ResponseType>>(
+      (resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.open(method, this._baseUrl + url)
 
-      xhr.addEventListener('abort', reject)
-      xhr.addEventListener('error', reject)
-      xhr.addEventListener('timeout', reject)
+        xhr.withCredentials = true
 
-      xhr.addEventListener('load', () => {
-        const headers = Object.fromEntries(
-          xhr
-            .getAllResponseHeaders()
-            .trim()
-            .split('\n')
-            .map((i) => {
-              const tuple = i.trim().split(':')
-              return [tuple[0].trim(), tuple[1].trim()]
-            })
-        )
-        const contentType = headers['content-type']
-        const responseBody = xhr.response
-        let data
-        if (contentType?.includes('application/json')) {
-          data = JSON.parse(responseBody)
-        } else {
-          data = responseBody
-        }
-        resolve({
-          data,
-          headers,
-          status: xhr.status,
-          statusText: xhr.statusText,
+        xhr.addEventListener('abort', reject)
+        xhr.addEventListener('error', reject)
+        xhr.addEventListener('timeout', reject)
+
+        xhr.addEventListener('load', () => {
+          const headers = Object.fromEntries(
+            xhr
+              .getAllResponseHeaders()
+              .trim()
+              .split('\n')
+              .map((i) => {
+                const tuple = i.trim().split(':')
+                return [tuple[0].trim(), tuple[1].trim()]
+              })
+          )
+          const contentType = headers['content-type']
+          const responseBody = xhr.response
+          let data
+          if (contentType?.includes('application/json')) {
+            data = JSON.parse(responseBody)
+          } else {
+            data = responseBody
+          }
+          resolve({
+            data,
+            headers,
+            status: xhr.status,
+            statusText: xhr.statusText,
+          })
         })
-      })
 
-      if (method === METHODS.GET || !param) {
-        xhr.send()
-      } else {
-        xhr.send(param)
+        if (method === METHODS.GET || !param) {
+          xhr.send()
+        } else if (getType(param) === 'formdata') {
+          xhr.send(param)
+        } else if (getType(param) === 'object') {
+          xhr.setRequestHeader('Content-Type', 'application/json')
+          xhr.send(JSON.stringify(param))
+        }
       }
-    })
+    )
   }
 }

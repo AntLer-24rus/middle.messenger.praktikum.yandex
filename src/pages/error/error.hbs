@@ -6,7 +6,7 @@
     {{#>slot name="body"}}
       <p class="{{classes.error-page__message}}">{{textError}}</p>
       <div class="{{classes.error-page__button}}">
-        {{>comp name="Button" text=buttonText type=buttonType $click=btnClick}}
+        {{>comp name="Button" text="Назад к чатам" type="stroke" $click=btnClick}}
       </div>
     {{/slot}}
   {{/comp}}

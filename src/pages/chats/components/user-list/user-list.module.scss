@@ -2,6 +2,19 @@
 @import '../../../../utils/mixins';
 @import '../../../../utils/variables';
 
+.overlay {
+  z-index: 999;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgb(0 0 0 / 70%);
+}
+
 .user-list {
   padding: 30px;
   width: 400px;
@@ -36,5 +49,11 @@
     color: $color-error;
     border: 1px solid $color-error;
     background-color: color.adjust($color-error, $lightness: 27%);
+
+    &:hover {
+      color: $color-white;
+      border: none;
+      background-color: $color-error;
+    }
   }
 }

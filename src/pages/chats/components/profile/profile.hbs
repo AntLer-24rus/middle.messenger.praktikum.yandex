@@ -7,7 +7,7 @@
           {{#if @root.isCurrentUser}}
             {{>comp name="Icon" iconName=(@root.icon) $click=@root.editProfile}}
           {{/if}}
-          {{>comp name="Icon" iconName="close" $click=close}}
+          {{>comp name="Icon" iconName="close" $click=@root.close}}
         </div>
       </div>
     {{/slot}}
@@ -21,7 +21,7 @@
             "
             $click="changeAvatar"
         >
-          {{@root.avatar}}
+          <img src="{{@root.avatar}}" alt="{{@root.userAvatar}}">
         </div>
         <div class="{{@root.classes.profile__error}}">{{@root.error}}</div>
         <div class="{{@root.classes.profile__user-name}}">{{@root.profile.display_name}}</div>
@@ -38,12 +38,22 @@
         {{/each}}
       </div>
     {{/slot}}
-    {{#if @root.isEdit}}
-      {{#>slot name="actions"}}
-        <div class="{{@root.classes.profile__action-wrapper}}">
-          {{>comp name="Button" text="Сменить пароль"}}
-        </div>
-      {{/slot}}
-    {{/if}}
+    {{#>slot name="actions"}}
+      <div class="{{@root.classes.profile__action-wrapper}}">
+        {{#if @root.isEdit}}
+          {{>comp name="Button" 
+                text="Сменить пароль"
+                $click=@root.editPassword
+          }}
+        {{/if}}
+        {{>comp name="Button"
+              text="Выйти"
+              type="stroke"
+              $click=@root.exit
+              className=@root.classes.profile__exit-btn
+        }}
+      </div>
+    {{/slot}}
   {{/comp}}
+  {{>comp name="PasChange"}}
 </div>

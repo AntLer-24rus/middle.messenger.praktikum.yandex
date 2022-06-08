@@ -1,13 +1,18 @@
+/* eslint @typescript-eslint/no-explicit-any: off */
 import type {
   HelperOptions,
   RuntimeOptions,
   TemplateDelegate,
 } from 'handlebars'
-
-import { Component, ComponentOptions } from './Component'
-
-import { last } from './last'
+import {
+  Component,
+  ComponentInterface,
+  ComponentOptions,
+  ExtendComponentConstructor,
+} from './Component'
 import { first } from './first'
+import { isEqual } from './isEqual'
+import { last } from './last'
 import { saveReplaceProperty } from './saveReplaceProperty'
 
 const DATA_SET_ID = 'id'
@@ -15,63 +20,105 @@ const DATA_SET_ID = 'id'
 const noopRender: TemplateDelegate = () => ''
 type ComponentSlots = Record<
   string,
-  (context: any, options: RuntimeOptions) => string
+  (context: unknown, options: RuntimeOptions) => string
 >
 
-interface HBSComponentOptions<DataType = any>
-  extends Omit<ComponentOptions<DataType>, 'name'> {
+interface HBSComponentOptions<DataType, PropsType>
+  extends Partial<
+    Pick<ComponentOptions<DataType, PropsType>, 'props' | 'listeners'>
+  > {
   slots?: ComponentSlots
+  templateHash?: any
 }
 
-interface HBSComponentConstructor<T = Component> {
-  new (options: HBSComponentOptions): T
-  componentName: string
+interface HBSComponentConstructor<
+  DataType extends object = any,
+  PropsType extends object = any,
+  T extends Component<DataType, PropsType> = Component<DataType, PropsType>
+> extends ExtendComponentConstructor {
+  new (options: HBSComponentOptions<DataType, PropsType>): T
 }
 
-interface DefineHBSComponentOptions<DataType = any, PropsType = any>
-  extends Omit<ComponentOptions<DataType, PropsType>, 'parent' | 'events'> {
+interface DefineHBSComponentOptions<
+  DataType extends object,
+  PropsType extends object,
+  EmitsType extends object
+> extends Partial<ComponentOptions<DataType, PropsType>> {
+  name: string
+  renderer: TemplateDelegate
+  emits: EmitsType
   components?: HBSComponentConstructor[]
   slots?: ComponentSlots
-  renderer: TemplateDelegate
 
-  nativeEvents?: ComponentOptions<DataType, PropsType>['events']
+  // nativeEvents?: ComponentOptions<DataType, PropsType, EmitsType>['DOMEvents']
 }
 
-type ListenersType = Required<ComponentOptions>['listeners']
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface HBSComponentInterface<DataType = any, PropsType = any>
+  extends ComponentInterface<DataType, PropsType> {
+  // render(context: any): DocumentFragment
+}
 
-const knownComponents: HBSComponentConstructor[] = []
+type ListenersType = Required<ComponentOptions<any, any>>['listeners']
 
-export function defineHBSComponent<DataType = any, PropsType = any>(
-  options: DefineHBSComponentOptions<DataType, PropsType>
-) {
+const knownComponents: HBSComponentConstructor<any, any>[] = []
+
+export function defineHBSComponent<
+  PropsType extends object,
+  EmitsType extends object,
+  DataType extends object
+>(options: DefineHBSComponentOptions<DataType, PropsType, EmitsType>) {
   const { renderer, components = [] } = options
+
   knownComponents.push(...components)
   function getKnownComponent(
     componentName: string
-  ): HBSComponentConstructor | undefined {
+  ): HBSComponentConstructor<DataType, PropsType> | undefined {
     return knownComponents.find(
       (kc) => kc.componentName === componentName
-    ) as HBSComponentConstructor
+    ) as HBSComponentConstructor<DataType, PropsType>
   }
-  class HBSComponent extends Component {
+
+  class HBSComponent
+    extends Component<DataType, PropsType>
+    implements HBSComponentInterface<DataType, PropsType>
+  {
     public static componentName: string = options.name
+
+    public static emits = {
+      ...super.emits,
+      ...options.emits,
+    }
 
     private _slots: ComponentSlots = {}
 
     private _hbsRuntimeOptions: RuntimeOptions
 
-    private _indexCompPartial = 0
+    private _templateHash
 
-    constructor(hbsOptions: HBSComponentOptions) {
-      const props = { ...options.props, ...hbsOptions.props }
+    constructor(hbsOptions: HBSComponentOptions<DataType, PropsType>) {
+      const props = { ...options.props, ...hbsOptions.props } as PropsType
+      function defaultData(this: PropsType): DataType {
+        return {} as DataType
+      }
+
+      const listeners: ComponentOptions<DataType, PropsType>['listeners'] = []
+
+      if (hbsOptions.listeners) {
+        listeners.push(...hbsOptions.listeners)
+      }
+      if (options.listeners) {
+        listeners.push(...options.listeners)
+      }
+
       super({
         name: options.name,
-        data: options.data,
+        data: options.data ?? defaultData,
         props,
-        events: options.nativeEvents,
-        listeners: hbsOptions.listeners,
-        parent: hbsOptions.parent,
+        DOMEvents: options.DOMEvents ?? {},
+        listeners,
       })
+      this._templateHash = hbsOptions.templateHash
       this._hbsRuntimeOptions = {
         partials: {
           comp: this._prepareComponent.bind(this),
@@ -79,7 +126,7 @@ export function defineHBSComponent<DataType = any, PropsType = any>(
         },
       }
       this._slots = hbsOptions.slots ?? {}
-      this.emit(Component.EVENTS.RENDER)
+      this.emit(Component.emits.RENDER)
     }
 
     private setSlotsAndProps(slots: ComponentSlots, props: any) {
@@ -88,9 +135,9 @@ export function defineHBSComponent<DataType = any, PropsType = any>(
       this.setProps(props)
     }
 
-    private getChild(): HBSComponent {
-      const comp = this.children[this._indexCompPartial] as HBSComponent
-      return comp
+    private getChildByHash(hash: any) {
+      // eslint-disable-next-line no-underscore-dangle
+      return this.children.find((comp) => isEqual(comp._templateHash, hash))
     }
 
     private _prepareSlot(...args: any[]): string {
@@ -107,20 +154,21 @@ export function defineHBSComponent<DataType = any, PropsType = any>(
       return slotRenderer({ parentComponent: this }, this._hbsRuntimeOptions)
     }
 
-    private _prepareComponent(...args: any[]): string {
-      const { parentComponent = this }: { parentComponent?: HBSComponent } =
-        first(args)
+    private _prepareComponent(...args: unknown[]): string {
+      const { parentComponent = this } = first(args) as {
+        parentComponent?: HBSComponent
+      }
       const {
-        hash: { name: componentName, ...propsAndHandler },
+        hash: { name: componentName, key: componentKey, ...propsAndHandler },
         fn: blockRenderer = noopRender,
         partials: basePartials,
-      }: HelperOptions & RuntimeOptions = last(args)
+      } = last(args) as HelperOptions & RuntimeOptions
 
       const props = Object.fromEntries(
         Object.entries(propsAndHandler).filter(
           ([key]) => !key.startsWith(Component.EVENT_PREFIX)
         )
-      )
+      ) as PropsType
 
       const slots: ComponentSlots = {}
       const listeners: ListenersType =
@@ -134,16 +182,16 @@ export function defineHBSComponent<DataType = any, PropsType = any>(
           })) ?? []
 
       const collectSlotRenderer: TemplateDelegate = (
-        ...collectSlotRendererArgs: any[]
+        ...collectSlotRendererArgs: unknown[]
       ) => {
         const {
           hash: { name: slotName },
           fn: slotRenderer,
-        } = last(collectSlotRendererArgs)
-        slots[slotName] = (_: any, { partials: localPartials }) => {
+        } = last(collectSlotRendererArgs) as { hash: any; fn: any }
+        slots[slotName] = (_: unknown, { partials: localPartials }) => {
           const restorePartials = saveReplaceProperty(
-            basePartials,
-            localPartials
+            basePartials as Record<string, unknown>,
+            localPartials as Record<string, unknown>
           )
           const slotTemplate = slotRenderer({ ...this.data })
           restorePartials()
@@ -156,8 +204,8 @@ export function defineHBSComponent<DataType = any, PropsType = any>(
           /\$.+="(?<name>.+)"/gm
         )
         for (const { groups } of l) {
-          if (options.nativeEvents) {
-            const event = options.nativeEvents[groups.name]
+          if (options.DOMEvents) {
+            const event = options.DOMEvents[groups.name]
             listeners.push({
               eventName: `${groups.name}.slot_${slotName}`,
               callback: (...callbackArgs: any[]) => {
@@ -168,49 +216,50 @@ export function defineHBSComponent<DataType = any, PropsType = any>(
         }
         return ''
       }
-      const restorePartials = saveReplaceProperty(basePartials, {
-        slot: collectSlotRenderer,
-        comp: () => '',
-      })
+      const restorePartials = saveReplaceProperty(
+        basePartials as Record<string, unknown>,
+        {
+          slot: collectSlotRenderer,
+          comp: () => '',
+        }
+      )
       blockRenderer(this.data)
       restorePartials()
 
       const ComponentConstructor = getKnownComponent(
         componentName
-      ) as HBSComponentConstructor<HBSComponent>
+      ) as HBSComponentConstructor<DataType, PropsType, HBSComponent>
       if (!ComponentConstructor)
         throw new Error(
           `Компонент ${componentName} не найден в известных компонентах`
         )
 
-      let component = parentComponent.getChild()
+      const templateHash = componentKey || { componentName, propsAndHandler }
+      let component = parentComponent.getChildByHash(templateHash)
 
       if (!component) {
-        component = new ComponentConstructor({
-          slots,
-          parent: parentComponent,
-          props,
-          listeners,
-        })
-
-        parentComponent.children.push(component)
+        component = parentComponent.appendChildren(
+          new ComponentConstructor({
+            slots,
+            props,
+            listeners,
+            templateHash,
+          })
+        )
       } else {
         component.setSlotsAndProps(slots, props)
       }
 
       const dataAttr = `data-${DATA_SET_ID}="${component.id}`
 
-      // eslint-disable-next-line no-underscore-dangle
-      parentComponent._indexCompPartial += 1
       return `
       <div ${dataAttr}">${componentName} -> ${JSON.stringify(props)}</div>
       `.trim()
     }
 
-    render(context: any): DocumentFragment {
+    protected render(context: any): DocumentFragment {
       const fragment = document.createElement('template')
 
-      this._indexCompPartial = 0
       const template = renderer({ ...context }, this._hbsRuntimeOptions)
       fragment.innerHTML = template
 
@@ -221,7 +270,8 @@ export function defineHBSComponent<DataType = any, PropsType = any>(
           `[data-${DATA_SET_ID}="${child.id}"]`
         )
         if (!stub) {
-          this.children.splice(idx, 1)
+          // this.children.splice(idx, 1)
+          child.remove()
         } else {
           stub.replaceWith(child.getContent())
           idx += 1
