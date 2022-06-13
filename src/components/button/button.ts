@@ -1,6 +1,6 @@
 import { defineHBSComponent } from '../../utils'
 import renderer from './button.hbs'
-import * as classes from './button.module.scss'
+import classes from './button.module.scss'
 
 type ButtonProps = {
   text: string
@@ -8,7 +8,7 @@ type ButtonProps = {
 }
 
 type ButtonData = {
-  classes: typeof classes.default
+  classes: typeof classes
   isStroke: boolean
 }
 
@@ -23,7 +23,7 @@ export default defineHBSComponent({
   props: defaultProps,
   data(): ButtonData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       isStroke: this.type === 'stroke',
     }
   },

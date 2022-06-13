@@ -1,6 +1,6 @@
-import renderer from './icon.hbs'
-import * as classes from './icon.module.scss'
 import { defineHBSComponent } from '../../utils'
+import renderer from './icon.hbs'
+import classes from './icon.module.scss'
 
 type IconProps = {
   iconName: string
@@ -8,7 +8,7 @@ type IconProps = {
 }
 
 type IconData = {
-  classes: typeof classes.default
+  classes: typeof classes
 }
 
 const props: IconProps = {
@@ -25,7 +25,7 @@ export default defineHBSComponent({
   props,
   data(): IconData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
     }
   },
   DOMEvents: {

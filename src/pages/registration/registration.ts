@@ -6,12 +6,12 @@ import {
   validator,
 } from '../../utils'
 import renderer from './registration.hbs'
-import * as classes from './registration.module.scss'
+import classes from './registration.module.scss'
 
 type RegistrationPageProps = Record<string, never>
 
 type RegistrationPageData = {
-  classes: typeof classes.default
+  classes: typeof classes
   inputs: {
     name: string
     label: string
@@ -45,7 +45,7 @@ export default defineHBSComponent({
   components: [TextField, Button, Card],
   data(): RegistrationPageData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       inputs: [
         {
           name: 'email',

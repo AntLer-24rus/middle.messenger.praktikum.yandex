@@ -1,7 +1,7 @@
 import { ChatsResponse } from '../../../../type/api'
 import { defineHBSComponent } from '../../../../utils'
 import renderer from './chat-preview.hbs'
-import * as classes from './chat-preview.module.scss'
+import classes from './chat-preview.module.scss'
 
 type ChatPreviewProps = {
   className?: string
@@ -10,7 +10,7 @@ type ChatPreviewProps = {
 }
 
 type ChatPreviewData = {
-  classes: typeof classes.default
+  classes: typeof classes
   hasUnread: boolean
   avatarAlt: string
   lastMessageTime: string | null
@@ -50,7 +50,7 @@ export default defineHBSComponent({
   props,
   data(): ChatPreviewData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       hasUnread: this.chatInfo.unread_count > 0,
       avatarAlt: this.chatInfo.title
         .split(' ')

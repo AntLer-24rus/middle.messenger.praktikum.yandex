@@ -3,7 +3,7 @@ import { ChatUserResponse } from '../../../../type/api'
 import { Component, defineHBSComponent } from '../../../../utils'
 import { UserView } from '../user-view'
 import renderer from './user-list.hbs'
-import * as classes from './user-list.module.scss'
+import classes from './user-list.module.scss'
 
 type UserListProps = {
   isHide: boolean
@@ -12,7 +12,7 @@ type UserListProps = {
   currentUserId: number
 }
 type UserListData = {
-  classes: typeof classes.default
+  classes: typeof classes
   searchString: string
   hideUserList: (this: Component) => void
   removeUser: (this: InstanceType<typeof UserView>, userId: number) => void
@@ -44,7 +44,7 @@ const UserList = defineHBSComponent({
   components: [Card, Icon, UserView, Overlay],
   data(): UserListData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       searchString: '',
       hideUserList() {
         const userList = this.getParentByName('UserList') as InstanceType<

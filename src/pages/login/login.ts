@@ -1,11 +1,11 @@
 import { Button, Card, TextField } from '../../components'
 import { collectFieldValues, defineHBSComponent, validator } from '../../utils'
 import renderer from './login.hbs'
-import * as classes from './login.module.scss'
+import classes from './login.module.scss'
 
 type LoginPageProps = Record<string, never>
 type LoginPageData = {
-  classes: typeof classes.default
+  classes: typeof classes
   inputs: {
     name: string
     label: string
@@ -34,7 +34,7 @@ export default defineHBSComponent({
   components: [TextField, Button, Card],
   data(): LoginPageData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       inputs: [
         {
           name: 'login',

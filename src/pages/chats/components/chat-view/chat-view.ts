@@ -2,7 +2,7 @@ import { Icon, TextField } from '../../../../components'
 import { Component, defineHBSComponent } from '../../../../utils'
 import { Message } from '../message'
 import renderer from './chat-view.hbs'
-import * as classes from './chat-view.module.scss'
+import classes from './chat-view.module.scss'
 
 type Message = {
   isSend: boolean
@@ -23,7 +23,7 @@ type HBSContext<P> = {
   }
 }
 type ChatViewData = {
-  classes: typeof classes.default
+  classes: typeof classes
   messageClass: (this: Message, ctx: HBSContext<ChatViewData>) => string
   showChatInfo: (
     this: Component<ChatViewData & ChatViewProps>,
@@ -47,15 +47,14 @@ const ChatView = defineHBSComponent({
   components: [Message, Icon, TextField],
   data(): ChatViewData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       showChatInfo(this: Component, e: Event) {
         this.parent!.emit('ChatView:showChatInfo', e)
       },
       messageClass() {
-        const cls = classes as unknown as typeof classes.default
-        const messageClasses = [cls.message]
-        if (this.isSend) messageClasses.push(cls.message_send)
-        else messageClasses.push(cls.message_income)
+        const messageClasses = [classes.message]
+        if (this.isSend) messageClasses.push(classes.message_send)
+        else messageClasses.push(classes.message_income)
         return messageClasses.join(' ')
       },
       sendMessage(message) {

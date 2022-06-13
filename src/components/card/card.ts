@@ -1,6 +1,6 @@
-import * as classes from './card.module.scss'
-import renderer from './card.hbs'
 import { defineHBSComponent } from '../../utils'
+import renderer from './card.hbs'
+import classes from './card.module.scss'
 
 type CardPropsType = {
   className?: string
@@ -8,7 +8,7 @@ type CardPropsType = {
 }
 
 type CardDataType = {
-  classes: typeof classes.default
+  classes: typeof classes
 }
 
 const props: CardPropsType = {}
@@ -21,7 +21,7 @@ export default defineHBSComponent({
   props,
   data(): CardDataType {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
     }
   },
 })

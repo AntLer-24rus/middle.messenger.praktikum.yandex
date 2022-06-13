@@ -1,9 +1,10 @@
 import {
-  LoginPageController,
-  RegistrationPageController,
   ChatsPageController,
   ErrorPageController,
+  LoginPageController,
+  RegistrationPageController,
 } from './controllers'
+import './style.scss'
 import { Router } from './utils'
 
 const router = Router.instance()

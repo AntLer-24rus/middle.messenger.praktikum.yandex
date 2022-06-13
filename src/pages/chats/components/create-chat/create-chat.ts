@@ -1,14 +1,14 @@
 import { Button, Card, TextField } from '../../../../components'
 import { defineHBSComponent } from '../../../../utils'
 import renderer from './create-chat.hbs'
-import * as classes from './create-chat.module.scss'
+import classes from './create-chat.module.scss'
 
 type CreateChatProps = {
   isHide: boolean
 }
 
 type CreateChatData = {
-  classes: typeof classes.default
+  classes: typeof classes
   chatName: string
   create: (this: InstanceType<typeof Button>, e: Event) => void
   cancel: (this: InstanceType<typeof Button>, e: Event) => void
@@ -34,7 +34,7 @@ export const CreateChat = defineHBSComponent({
   components: [TextField, Button, Card],
   data(): CreateChatData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       chatName: '',
       validateChatName(value) {
         const createChat = this.getParentByName('CreateChat')!

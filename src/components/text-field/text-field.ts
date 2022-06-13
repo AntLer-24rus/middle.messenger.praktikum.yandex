@@ -3,7 +3,7 @@ import { defineHBSComponent, HBSComponentInterface } from '../../utils'
 import { Input } from './modules/input'
 import { Label } from './modules/label'
 import renderer from './text-field.hbs'
-import * as classes from './text-field.module.scss'
+import classes from './text-field.module.scss'
 
 type TextFieldProps = {
   validate: (val: string) => string

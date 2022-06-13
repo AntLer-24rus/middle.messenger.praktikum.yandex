@@ -1,14 +1,14 @@
 import { defineHBSComponent } from '../../../../utils'
 import { ChatPreview } from '../chat-preview'
 import renderer from './chats-list.hbs'
-import * as classes from './chats-list.module.scss'
+import classes from './chats-list.module.scss'
 
 type ChatListProps = {
   className: string
   chats: any[]
 }
 type ChatListData = {
-  classes: typeof classes.default
+  classes: typeof classes
   selectedChatId: number | null
   selectChat(this: InstanceType<typeof ChatPreview>): void
 }
@@ -28,7 +28,7 @@ export default defineHBSComponent({
   components: [ChatPreview],
   data(): ChatListData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       selectedChatId: null,
       selectChat() {
         const chatList = this.getParentByName('ChatList')!
