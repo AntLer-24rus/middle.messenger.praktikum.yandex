@@ -44,7 +44,7 @@ export const PasChange = defineHBSComponent({
       oldPasswordValidator(v) {
         const pasChange = this.getParentByName('PasChange')!
         pasChange.data.oldPassword = v
-        pasChange.data.needUpdate = false
+        pasChange.needUpdate = false
 
         return validator('password', v)
       },
