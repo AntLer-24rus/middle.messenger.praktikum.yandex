@@ -1,18 +1,35 @@
-const path = require('path')
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+/* eslint-disable import/no-extraneous-dependencies */
+import { CleanWebpackPlugin } from 'clean-webpack-plugin'
+import CopyWebpackPlugin from 'copy-webpack-plugin'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import fs from 'node:fs'
+import path from 'node:path'
+import * as webpack from 'webpack'
+import 'webpack-dev-server'
+
+const getRoot = (dir: string): string => {
+  if (fs.existsSync(path.resolve(dir, 'package.json'))) {
+    return dir
+  }
+  return getRoot(path.resolve(dir, '..'))
+}
 
 const isDevelopment = process.env.NODE_ENV === 'development'
+const projectRoot = getRoot(__dirname)
 
-module.exports = {
+const PATHS = {
+  src: path.resolve(projectRoot, 'src'),
+  dist: path.resolve(projectRoot, 'dist'),
+  build: path.resolve(projectRoot, 'build'),
+}
+
+const config: webpack.Configuration = {
   mode: 'development',
   target: 'web',
-  entry: './src/index.ts',
+  entry: path.resolve(PATHS.src, 'index.ts'),
   output: {
-    path: path.resolve(__dirname, '..', 'dist'),
+    path: PATHS.dist,
     filename: '[name]-[fullhash].js',
     chunkFilename: '[name].bundle-[fullhash].js',
   },
@@ -37,7 +54,7 @@ module.exports = {
   },
   devServer: {
     static: {
-      directory: path.join(__dirname, 'dist'),
+      directory: PATHS.dist,
     },
     compress: true,
     hot: true,
@@ -47,12 +64,12 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.ts$/,
         use: [
           {
             loader: 'ts-loader',
             options: {
-              configFile: path.resolve(__dirname, '..', 'tsconfig.json'),
+              configFile: path.resolve(projectRoot, 'tsconfig.json'),
             },
           },
         ],
@@ -62,8 +79,7 @@ module.exports = {
         test: /\.hbs$/,
         use: [
           {
-            loader: './build/hbs-loader.js',
-            // loader: 'handlebars-loader',
+            loader: path.resolve(PATHS.build, 'hbs-loader.ts'),
             options: {
               ignorePartials: true,
               knownHelpersOnly: false,
@@ -109,30 +125,21 @@ module.exports = {
           },
         ],
       },
-      // {
-      //   test: /\.(svg|woff|woff2|ttf|eot|otf)([\?]?.*)$/,
-      //   use: [
-      //     {
-      //       loader: 'file-loader?name=assets/fonts/[name].[ext]',
-      //     },
-      //   ],
-      // },
     ],
   },
   plugins: [
-    // new BundleAnalyzerPlugin(),
     new CleanWebpackPlugin(),
     new CopyWebpackPlugin({
       patterns: [
         {
           from: '*',
-          context: path.resolve(__dirname, '..', 'src', 'assets', 'favicons'),
+          context: path.resolve(PATHS.src, 'assets', 'favicons'),
           to: './',
         },
       ],
     }),
     new HtmlWebpackPlugin({
-      template: 'src/index.html',
+      template: path.resolve(PATHS.src, 'index.html'),
       filename: 'index.html',
       minify: {
         collapseWhitespace: true,
@@ -147,3 +154,5 @@ module.exports = {
     }),
   ],
 }
+
+export default config
