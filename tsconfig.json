@@ -10,8 +10,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,
-    "strictNullChecks": true,
-    "plugins": [{ "name": "typescript-plugin-css-modules" }]
+    "strictNullChecks": true
+    // "plugins": [{ "name": "typescript-plugin-css-modules" }]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts"]
 }
