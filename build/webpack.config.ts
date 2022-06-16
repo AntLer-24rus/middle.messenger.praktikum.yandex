@@ -32,6 +32,7 @@ const config: webpack.Configuration = {
     path: PATHS.dist,
     filename: '[name]-[fullhash].js',
     chunkFilename: '[name].bundle-[fullhash].js',
+    publicPath: '/',
   },
   optimization: {
     runtimeChunk: true,
