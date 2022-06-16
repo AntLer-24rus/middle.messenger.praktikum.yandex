@@ -1,10 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
+import fs from 'fs'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-import fs from 'node:fs'
-import path from 'node:path'
+import path from 'path'
 import * as webpack from 'webpack'
 import 'webpack-dev-server'
 
