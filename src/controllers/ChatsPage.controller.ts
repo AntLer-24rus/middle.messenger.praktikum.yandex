@@ -3,7 +3,12 @@ import { Profile } from '../pages/chats'
 import { CreateChat } from '../pages/chats/components/create-chat'
 import { UserList } from '../pages/chats/components/user-list'
 import { AuthService, ChatsService, RealTimeMessageService } from '../services'
-import { ChatsResponse, InstantMessage, UserResponse } from '../type/api'
+import {
+  ChatsResponse,
+  InstantMessage,
+  OldInstantMessage,
+  UserResponse,
+} from '../type/api'
 import { cloneDeep, connect, Controller, disconnect } from '../utils'
 import { ProfileController } from './Profile.controller'
 import { UserListController } from './UserList.controller'
@@ -139,6 +144,12 @@ export class ChatsPageController extends Controller<
       ({ id }) => id === chatId
     )
 
+    window.history.replaceState(
+      null,
+      '',
+      currentChat ? `#${currentChat.id}` : ''
+    )
+
     const sendMessage = (message: string) => {
       if (!this._realTimeMessageService) {
         throw new Error('Нет подключения для отправки сообщения')
@@ -182,6 +193,32 @@ export class ChatsPageController extends Controller<
             this.baseComponent.setProps({ messages })
           }
         )
+        connect(
+          this._realTimeMessageService,
+          RealTimeMessageService.emits.oldMessages,
+          (oldMessages: OldInstantMessage[]) => {
+            const forCurrentChatMessages = oldMessages
+              .filter((message) => message.chat_id === chatId)
+              .map((message) => ({
+                date: new Date(message.time),
+                isSend: userId === Number(message.user_id),
+                text: message.content,
+                type: 'income' as 'income' | 'send',
+              }))
+              .reverse()
+
+            const messages = cloneDeep(this.baseComponent.data.messages)
+
+            messages.push(...forCurrentChatMessages)
+
+            this.baseComponent.setProps({ messages })
+          }
+        )
+
+        this._realTimeMessageService.emit(
+          RealTimeMessageService.listening.unreadMessages,
+          0
+        )
         this.baseComponent.setProps({ currentChat })
       }
     )
@@ -190,7 +227,18 @@ export class ChatsPageController extends Controller<
   private _updateChats(newChats: ChatsResponse[]) {
     const chats = cloneDeep(this.baseComponent.data.chats)
     chats.push(...newChats)
+    const chatId = parseInt(window.location.hash.substring(1), 10)
+    const currentChat = chats.find((chat) => chat.id === chatId)
     this.baseComponent.setProps({ chats })
+    if (!currentChat) {
+      window.history.replaceState(
+        null,
+        document.title,
+        window.location.pathname + window.location.search
+      )
+    } else {
+      this._chatsService.emit(ChatsService.listening.token, chatId)
+    }
   }
 
   private _chatCreateToggle() {
