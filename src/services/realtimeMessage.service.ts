@@ -6,6 +6,7 @@ export class RealTimeMessageService extends WSService {
     close: 'RealTimeMessageService:close:emits',
     error: 'RealTimeMessageService:error:emits',
     message: 'RealTimeMessageService:message:emits',
+    oldMessages: 'RealTimeMessageService:oldMessages:emits',
   }
 
   static listening = {
@@ -31,29 +32,22 @@ export class RealTimeMessageService extends WSService {
   }
 
   protected open(): void {
-    console.log('RealTimeMessageService -> Open', this)
-    this.socket.send(
-      JSON.stringify({
-        content: '0',
-        type: 'get old',
-      })
-    )
     this.emit(RealTimeMessageService.emits.open)
   }
 
   protected close(code: number, reason: string): void {
-    console.log('RealTimeMessageService -> Close', code, reason)
     this.emit(RealTimeMessageService.emits.close, code, reason)
   }
 
   protected error(description: { code: number; reason: string }): void {
-    console.log('RealTimeMessageService -> Error', description)
-    this.emit(RealTimeMessageService.emits.error)
+    this.emit(RealTimeMessageService.emits.error, description)
   }
 
   protected message(data: any): void {
     if (Array.isArray(data)) {
-      console.log('old messages :>> ', data)
+      if (data.every((item) => item.type === 'message')) {
+        this.emit(RealTimeMessageService.emits.oldMessages, data)
+      }
     } else {
       const { type } = data
       if (type === 'message') {

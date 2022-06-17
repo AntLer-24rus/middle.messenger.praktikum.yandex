@@ -1,14 +1,14 @@
 import { Button, Card } from '../../components'
 import { defineHBSComponent } from '../../utils'
 import renderer from './error.hbs'
-import * as classes from './error.module.scss'
+import classes from './error.module.scss'
 
 type ErrorProps = {
   code: number
   textError: string
 }
 type ErrorData = {
-  classes: typeof classes.default
+  classes: typeof classes
   btnClick: (this: InstanceType<typeof Button>) => void
 }
 
@@ -28,7 +28,7 @@ export const ErrorPage = defineHBSComponent({
   components: [Card, Button],
   data(): ErrorData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       btnClick() {
         const errorPage = this.getParentByName('Error') as InstanceType<
           typeof ErrorPage

@@ -1,13 +1,13 @@
 import { defineHBSComponent } from '../../utils'
 import renderer from './overlay.hbs'
-import * as classes from './overlay.module.scss'
+import classes from './overlay.module.scss'
 
 type OverlayProps = {
   isHide: boolean
 }
 
 type OverlayData = {
-  classes: typeof classes.default
+  classes: typeof classes
 }
 
 const props: OverlayProps = {
@@ -22,7 +22,7 @@ export default defineHBSComponent({
   props,
   data(): OverlayData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
     }
   },
 })

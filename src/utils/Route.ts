@@ -21,16 +21,9 @@ export class Route {
     this._props = props
   }
 
-  // navigate(pathname: string) {
-  //   if (this.match(pathname)) {
-  //     this._pathname = pathname
-  //     this.render()
-  //   }
-  // }
-
   leave() {
     if (this._controller) {
-      this._controller.emit(Controller.listening.hide)
+      this._controller = null
     }
   }
 
@@ -44,7 +37,7 @@ export class Route {
 
   render(selector: string) {
     if (!this._controller) {
-      this._controller = new this._ComponentController(this._props)
+      this._controller = new this._ComponentController({ props: this._props })
     }
 
     this._controller.emit(Controller.listening.mount, selector)

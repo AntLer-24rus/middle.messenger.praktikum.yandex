@@ -1,14 +1,14 @@
 import { Button, Card, Icon, TextField } from '../../../../../components'
 import { defineHBSComponent, validator } from '../../../../../utils'
 import renderer from './paschange.hbs'
-import * as classes from './paschange.module.scss'
+import classes from './paschange.module.scss'
 
 type PasChangeProps = {
   isHide: boolean
 }
 
 type PasChangeData = {
-  classes: typeof classes.default
+  classes: typeof classes
   oldPassword: string
   newPassword: string
   changePassword: (this: InstanceType<typeof Button>, e: Event) => void
@@ -39,12 +39,12 @@ export const PasChange = defineHBSComponent({
   components: [Icon, TextField, Button, Card],
   data(): PasChangeData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       oldPassword: '',
       oldPasswordValidator(v) {
         const pasChange = this.getParentByName('PasChange')!
         pasChange.data.oldPassword = v
-        pasChange.data.needUpdate = false
+        pasChange.needUpdate = false
 
         return validator('password', v)
       },

@@ -1,7 +1,7 @@
 import { ChatUserResponse } from '../../../../type/api'
 import { Component, defineHBSComponent } from '../../../../utils'
 import renderer from './user-view.hbs'
-import * as classes from './user-view.module.scss'
+import classes from './user-view.module.scss'
 
 type UserViewProps = {
   userInfo: ChatUserResponse[number]
@@ -9,7 +9,7 @@ type UserViewProps = {
 }
 
 type UserViewData = {
-  classes: typeof classes.default
+  classes: typeof classes
   isAdmin: boolean
   isCurrentUser: boolean
   isInteract: boolean
@@ -44,7 +44,7 @@ const UserView = defineHBSComponent({
   props,
   data(): UserViewData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       isAdmin: this.userInfo.role === 'admin',
       isCurrentUser: this.userInfo.id === this.currentUserId,
       isInteract:

@@ -1,6 +1,6 @@
-import renderer from './message.hbs'
-import * as classes from './message.module.scss'
 import { defineHBSComponent } from '../../../../utils'
+import renderer from './message.hbs'
+import classes from './message.module.scss'
 
 type MessageProps = {
   className?: string
@@ -9,7 +9,7 @@ type MessageProps = {
 }
 
 type MessageData = {
-  classes: typeof classes.default
+  classes: typeof classes
   typeClass: string
   formattedDate: (this: MessageData & MessageProps) => string
 }
@@ -26,10 +26,9 @@ export default defineHBSComponent({
   emits,
   props,
   data(): MessageData {
-    const cl = classes as unknown as typeof classes.default
     return {
-      classes: cl,
-      typeClass: this.isSend ? cl.message_send : cl.message_income,
+      classes,
+      typeClass: this.isSend ? classes.message_send : classes.message_income,
       formattedDate() {
         return this.date.toLocaleString('ru')
       },

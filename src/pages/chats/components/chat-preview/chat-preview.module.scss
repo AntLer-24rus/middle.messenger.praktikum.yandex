@@ -23,6 +23,8 @@
   &__avatar {
     width: 80px;
     height: 80px;
+    min-width: 80px;
+    min-height: 80px;
     font-size: $extra-large-text;
     background: $color-gray;
     border-radius: 50%;
@@ -53,6 +55,10 @@
   &__last-msg {
     width: 70%;
     font-size: $base-text;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    line-height: $base-text;
   }
 
   &__time {

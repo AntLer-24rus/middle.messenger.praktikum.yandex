@@ -11,18 +11,22 @@
   flex-wrap: wrap;
 
   &__text {
-    flex-grow: 2;
+    width: 100%;
     line-height: 1rem;
     font-size: $base-text;
   }
 
   &__time {
     padding-top: 5px;
-    font-size: $slam-text;
+    font-size: $extra-slam-text;
   }
 
   &__status {
     margin-left: 5px;
+
+    svg {
+      height: 10px;
+    }
   }
 
   &_send {

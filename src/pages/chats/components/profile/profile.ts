@@ -1,3 +1,4 @@
+/* eslint camelcase: ["error", {"properties": "never", ignoreDestructuring: true}] */
 import { Icon, TextField } from '../../../../components'
 import {
   Component,
@@ -7,7 +8,7 @@ import {
 } from '../../../../utils'
 import { PasChange } from './paschange'
 import renderer from './profile.hbs'
-import * as classes from './profile.module.scss'
+import classes from './profile.module.scss'
 
 type ProfileProps = {
   isCurrentUser: boolean
@@ -32,7 +33,7 @@ type HBSContext<P> = {
 }
 
 type ProfileData = {
-  classes: typeof classes.default
+  classes: typeof classes
   isEdit: boolean
   userAvatar: (this: ProfileData & ProfileProps) => string
   label: (ctx: HBSContext<ProfileData>) => string
@@ -91,6 +92,8 @@ const emits = {
 
 export type ProfileInstance = HBSComponentInterface<ProfileData, ProfileProps>
 
+const FIRST_LATTER = 0
+
 export default defineHBSComponent<ProfileProps, typeof emits, ProfileData>({
   name: 'Profile',
   renderer,
@@ -99,17 +102,21 @@ export default defineHBSComponent<ProfileProps, typeof emits, ProfileData>({
   components: [Icon, TextField, PasChange],
   data() {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       isEdit: false,
       userAvatar() {
-        const { display_name, first_name, second_name } = this.profile
-        return display_name
-          ? display_name
+        const {
+          display_name: displayName,
+          first_name: firstName,
+          second_name: secondName,
+        } = this.profile
+        return displayName
+          ? displayName
               .split(' ')
-              .map((word) => word[0])
+              .map((word) => word[FIRST_LATTER])
               .slice(0, 2)
               .join('')
-          : `${first_name[0]}${second_name[0]}`
+          : `${firstName[FIRST_LATTER]}${secondName[FIRST_LATTER]}`
       },
       label({ data: { key } }) {
         if (!key) throw new Error('Неверное использование label()')

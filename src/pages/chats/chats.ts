@@ -2,7 +2,7 @@ import { Icon, TextField } from '../../components'
 import { ChatsResponse } from '../../type/api'
 import { defineHBSComponent, HBSComponentInterface } from '../../utils'
 import renderer from './chats.hbs'
-import * as classes from './chats.module.scss'
+import classes from './chats.module.scss'
 import { ChatView } from './components/chat-view'
 import { ChatsList } from './components/chats-list'
 import { CreateChat } from './components/create-chat'
@@ -20,7 +20,7 @@ type ChatsProps = {
 }
 
 type ChatsData = {
-  classes: typeof classes.default
+  classes: typeof classes
   currentChat: ChatsResponse | undefined
   selectChat(this: InstanceType<typeof ChatsList>, id: number): void
   openSetting(this: InstanceType<typeof Icon>, e: Event): void
@@ -58,7 +58,7 @@ export const ChatsPage = defineHBSComponent({
   ],
   data(): ChatsData {
     return {
-      classes: classes as unknown as typeof classes.default,
+      classes,
       currentChat: undefined,
       selectChat(selectedId) {
         const chats = this.getParentByName('Chats') as InstanceType<
